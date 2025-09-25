@@ -75,49 +75,84 @@ million-test/
 - [MongoDB Community Server](https://www.mongodb.com/try/download/community)
 - [Git](https://git-scm.com/)
 
-## 🚀 Getting Started
+## ⚡ Quick Start (5 minutes)
 
-### 1. Clone the Repository
+### Prerequisites Check
+Make sure you have installed:
+- [.NET Core 9 SDK](https://dotnet.microsoft.com/download) 
+- [Node.js 18+](https://nodejs.org/)
+- [MongoDB](https://www.mongodb.com/try/download/community) (running on localhost:27017)
+
+### Option 1: Start Both Services (Recommended)
+
+**Terminal 1 - Backend API:**
+```bash
+cd backend/MillionTestApi
+dotnet run
+# ✅ API running at http://localhost:5000
+# ✅ Swagger docs at http://localhost:5000/swagger
+```
+
+**Terminal 2 - Frontend App:**
+```bash
+cd frontend  
+npm run dev
+# ✅ App running at http://localhost:3000
+```
+
+### Option 2: One-Step Setup Script
+
+```bash
+# Run this from the project root
+./start.sh  # Creates this script below
+```
+
+### Option 3: Manual Setup
+
+#### 1. Clone Repository
 ```bash
 git clone <repository-url>
 cd million-test
 ```
 
-### 2. Setup Backend
-
+#### 2. Backend Setup
 ```bash
 cd backend/MillionTestApi
 
-# Restore dependencies
+# Install dependencies and run tests
 dotnet restore
+dotnet build  
+dotnet test   # Should pass all 15 tests
 
-# Build the project
-dotnet build
-
-# Run tests
-dotnet test
-
-# Start the API (will run on http://localhost:5000)
-dotnet run
+# Start API server
+dotnet run --urls="http://localhost:5000"
 ```
 
-The API will be available at:
-- **HTTP**: http://localhost:5000
-- **Swagger UI**: http://localhost:5000/swagger
-
-### 3. Setup Frontend
-
+#### 3. Frontend Setup  
 ```bash
 cd frontend
 
 # Install dependencies
 npm install
 
-# Start development server (will run on http://localhost:3000)
+# Start development server
 npm run dev
 ```
 
-The frontend will be available at http://localhost:3000
+### 🌐 Access Points
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:5000  
+- **API Documentation**: http://localhost:5000/swagger
+- **Health Check**: http://localhost:5000/api/properties
+
+### 🧪 Verify Everything Works
+```bash
+# Test backend
+curl http://localhost:5000/api/properties
+
+# Test frontend (should show property search page)
+open http://localhost:3000
+```
 
 ### 4. Setup MongoDB
 
