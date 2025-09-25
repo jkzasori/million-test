@@ -154,6 +154,21 @@ curl http://localhost:5000/api/properties
 open http://localhost:3000
 ```
 
+### 🎲 Sample Data Generation
+
+The application needs sample data to showcase its features. Generate realistic sample data:
+
+```bash
+# Generate 2,500 properties with owners, images, and transaction history
+./seed-data.sh
+```
+
+This creates:
+- **1,000 property owners** with realistic profiles
+- **2,500 properties** with detailed information
+- **8,600+ property images** from Unsplash
+- **5,000+ transaction records** with pricing history
+
 ### 4. Setup MongoDB
 
 1. Install and start MongoDB locally
