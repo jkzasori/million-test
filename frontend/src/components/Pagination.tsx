@@ -41,127 +41,147 @@ export default function Pagination({
   const pages = getPageNumbers();
 
   return (
-    <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-8">
-      <div className="flex-1 flex justify-between sm:hidden">
-        <button
-          onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Previous
-        </button>
-        <button
-          onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Next
-        </button>
-      </div>
-
-      <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-        <div>
-          <p className="text-sm text-gray-700">
-            Showing <span className="font-medium">{startItem}</span> to{' '}
-            <span className="font-medium">{endItem}</span> of{' '}
-            <span className="font-medium">{totalCount}</span> results
+    <div className="glass card-luxury p-8 mt-12 animate-slide-up">
+      {/* Mobile Pagination */}
+      <div className="flex flex-col sm:hidden space-y-4">
+        <div className="text-center">
+          <p className="text-white/80 text-sm">
+            Page <span className="text-luxury font-semibold">{currentPage}</span> of{' '}
+            <span className="text-luxury font-semibold">{totalPages}</span>
+          </p>
+          <p className="text-white/60 text-xs mt-1">
+            {startItem}-{endItem} of {totalCount.toLocaleString()} properties
           </p>
         </div>
-        <div>
-          <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-            {/* Previous button */}
-            <button
-              onClick={() => onPageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        <div className="flex justify-center space-x-3">
+          <button
+            onClick={() => onPageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="btn-secondary flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span>←</span>
+            <span>Previous</span>
+          </button>
+          <button
+            onClick={() => onPageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="btn-secondary flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span>Next</span>
+            <span>→</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Desktop Pagination */}
+      <div className="hidden sm:flex items-center justify-between">
+        {/* Results Info */}
+        <div className="flex items-center space-x-4">
+          <div className="text-white/80">
+            <span className="text-sm">Showing </span>
+            <span className="text-luxury font-semibold">{startItem.toLocaleString()}</span>
+            <span className="text-sm"> - </span>
+            <span className="text-luxury font-semibold">{endItem.toLocaleString()}</span>
+            <span className="text-sm"> of </span>
+            <span className="text-luxury font-semibold">{totalCount.toLocaleString()}</span>
+            <span className="text-sm"> exceptional properties</span>
+          </div>
+        </div>
+
+        {/* Navigation Controls */}
+        <div className="flex items-center space-x-2">
+          {/* Previous Button */}
+          <button
+            onClick={() => onPageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="glass hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed p-3 rounded-xl transition-all duration-300 group"
+            title="Previous page"
+          >
+            <svg
+              className="h-5 w-5 text-white/80 group-hover:text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <span className="sr-only">Previous</span>
-              <svg
-                className="h-5 w-5"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
 
-            {/* First page if not visible */}
-            {pages[0] > 1 && (
-              <>
-                <button
-                  onClick={() => onPageChange(1)}
-                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  1
-                </button>
-                {pages[0] > 2 && (
-                  <span className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
-                    ...
-                  </span>
-                )}
-              </>
-            )}
-
-            {/* Page numbers */}
-            {pages.map((page) => (
+          {/* First page if not visible */}
+          {pages[0] > 1 && (
+            <>
               <button
-                key={page}
-                onClick={() => onPageChange(page)}
-                className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                  page === currentPage
-                    ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                    : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-                }`}
+                onClick={() => onPageChange(1)}
+                className="glass hover:bg-white/20 px-4 py-2 rounded-xl text-white/80 hover:text-white font-medium transition-all duration-300"
               >
-                {page}
+                1
               </button>
-            ))}
+              {pages[0] > 2 && (
+                <span className="text-white/40 px-2">⋯</span>
+              )}
+            </>
+          )}
 
-            {/* Last page if not visible */}
-            {pages[pages.length - 1] < totalPages && (
-              <>
-                {pages[pages.length - 1] < totalPages - 1 && (
-                  <span className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
-                    ...
-                  </span>
-                )}
-                <button
-                  onClick={() => onPageChange(totalPages)}
-                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  {totalPages}
-                </button>
-              </>
-            )}
-
-            {/* Next button */}
+          {/* Page Numbers */}
+          {pages.map((page) => (
             <button
-              onClick={() => onPageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              key={page}
+              onClick={() => onPageChange(page)}
+              className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
+                page === currentPage
+                  ? 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold shadow-lg'
+                  : 'glass hover:bg-white/20 text-white/80 hover:text-white'
+              }`}
             >
-              <span className="sr-only">Next</span>
-              <svg
-                className="h-5 w-5"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              {page}
             </button>
-          </nav>
+          ))}
+
+          {/* Last page if not visible */}
+          {pages[pages.length - 1] < totalPages && (
+            <>
+              {pages[pages.length - 1] < totalPages - 1 && (
+                <span className="text-white/40 px-2">⋯</span>
+              )}
+              <button
+                onClick={() => onPageChange(totalPages)}
+                className="glass hover:bg-white/20 px-4 py-2 rounded-xl text-white/80 hover:text-white font-medium transition-all duration-300"
+              >
+                {totalPages}
+              </button>
+            </>
+          )}
+
+          {/* Next Button */}
+          <button
+            onClick={() => onPageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="glass hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed p-3 rounded-xl transition-all duration-300 group"
+            title="Next page"
+          >
+            <svg
+              className="h-5 w-5 text-white/80 group-hover:text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Progress Indicator */}
+      <div className="mt-6">
+        <div className="flex items-center justify-between text-xs text-white/50 mb-2">
+          <span>Progress</span>
+          <span>{Math.round((currentPage / totalPages) * 100)}% explored</span>
+        </div>
+        <div className="w-full bg-white/10 rounded-full h-1">
+          <div
+            className="bg-gradient-to-r from-yellow-400 to-yellow-500 h-1 rounded-full transition-all duration-500"
+            style={{ width: `${(currentPage / totalPages) * 100}%` }}
+          ></div>
         </div>
       </div>
     </div>
