@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export interface Property {
   idProperty: number;
@@ -147,12 +148,12 @@ const LuxuryPropertyCard: React.FC<LuxuryPropertyCardProps> = ({
         </div>
 
         {/* View Button */}
-        <button className="view-details-btn" onClick={handleView}>
+        <Link href={`/property/${property.idProperty}`} className="view-details-btn">
           View Details
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
             <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-        </button>
+        </Link>
       </div>
 
       <style jsx>{`
@@ -385,7 +386,7 @@ const LuxuryPropertyCard: React.FC<LuxuryPropertyCardProps> = ({
           width: 100%;
           padding: var(--spacing-md);
           background: var(--color-primary);
-          color: white;
+          color: white !important;
           border: none;
           border-radius: var(--radius-md);
           font-weight: 500;
@@ -397,6 +398,7 @@ const LuxuryPropertyCard: React.FC<LuxuryPropertyCardProps> = ({
           display: flex;
           align-items: center;
           justify-content: center;
+          text-decoration: none !important;
           gap: var(--spacing-sm);
         }
 
