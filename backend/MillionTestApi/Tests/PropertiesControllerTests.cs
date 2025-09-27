@@ -3,7 +3,7 @@ using Moq;
 using NUnit.Framework;
 using MillionTestApi.Controllers;
 using MillionTestApi.DTOs;
-using MillionTestApi.Services;
+using MillionTestApi.Application.Services;
 
 namespace MillionTestApi.Tests;
 

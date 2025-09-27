@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MillionTestApi.DTOs;
-using MillionTestApi.Services;
+using MillionTestApi.Application.Services;
 
 namespace MillionTestApi.Controllers;
 
@@ -34,25 +34,18 @@ public class PropertiesController : ControllerBase
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10)
     {
-        try
+        var filter = new PropertyFilterDto
         {
-            var filter = new PropertyFilterDto
-            {
-                Name = name,
-                Address = address,
-                MinPrice = minPrice,
-                MaxPrice = maxPrice,
-                Page = page,
-                PageSize = pageSize
-            };
+            Name = name,
+            Address = address,
+            MinPrice = minPrice,
+            MaxPrice = maxPrice,
+            Page = page,
+            PageSize = pageSize
+        };
 
-            var result = await _propertyService.GetPropertiesAsync(filter);
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { message = "Internal server error", error = ex.Message });
-        }
+        var result = await _propertyService.GetPropertiesAsync(filter);
+        return Ok(result);
     }
 
     /// <summary>
@@ -63,21 +56,8 @@ public class PropertiesController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<PropertyDetailDto>> GetProperty(int id)
     {
-        try
-        {
-            var property = await _propertyService.GetPropertyByIdAsync(id);
-            
-            if (property == null)
-            {
-                return NotFound(new { message = $"Property with ID {id} not found" });
-            }
-
-            return Ok(property);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { message = "Internal server error", error = ex.Message });
-        }
+        var property = await _propertyService.GetPropertyByIdAsync(id);
+        return Ok(property);
     }
 
     /// <summary>
@@ -88,38 +68,31 @@ public class PropertiesController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<PropertyDto>> CreateProperty(PropertyDto propertyDto)
     {
-        try
+        var property = new Models.Property
         {
-            var property = new Models.Property
-            {
-                IdProperty = propertyDto.IdProperty,
-                Name = propertyDto.Name,
-                Address = propertyDto.Address,
-                Price = propertyDto.Price,
-                CodeInternal = propertyDto.CodeInternal,
-                Year = propertyDto.Year,
-                IdOwner = propertyDto.IdOwner
-            };
+            IdProperty = propertyDto.IdProperty,
+            Name = propertyDto.Name,
+            Address = propertyDto.Address,
+            Price = propertyDto.Price,
+            CodeInternal = propertyDto.CodeInternal,
+            Year = propertyDto.Year,
+            IdOwner = propertyDto.IdOwner
+        };
 
-            var createdProperty = await _propertyService.CreatePropertyAsync(property);
-            
-            var result = new PropertyDto
-            {
-                IdProperty = createdProperty.IdProperty,
-                IdOwner = createdProperty.IdOwner,
-                Name = createdProperty.Name,
-                Address = createdProperty.Address,
-                Price = createdProperty.Price,
-                CodeInternal = createdProperty.CodeInternal,
-                Year = createdProperty.Year
-            };
-
-            return CreatedAtAction(nameof(GetProperty), new { id = result.IdProperty }, result);
-        }
-        catch (Exception ex)
+        var createdProperty = await _propertyService.CreatePropertyAsync(property);
+        
+        var result = new PropertyDto
         {
-            return StatusCode(500, new { message = "Internal server error", error = ex.Message });
-        }
+            IdProperty = createdProperty.IdProperty,
+            IdOwner = createdProperty.IdOwner,
+            Name = createdProperty.Name,
+            Address = createdProperty.Address,
+            Price = createdProperty.Price,
+            CodeInternal = createdProperty.CodeInternal,
+            Year = createdProperty.Year
+        };
+
+        return CreatedAtAction(nameof(GetProperty), new { id = result.IdProperty }, result);
     }
 
     /// <summary>
@@ -131,43 +104,31 @@ public class PropertiesController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<PropertyDto>> UpdateProperty(int id, PropertyDto propertyDto)
     {
-        try
+        var property = new Models.Property
         {
-            var property = new Models.Property
-            {
-                IdProperty = id,
-                Name = propertyDto.Name,
-                Address = propertyDto.Address,
-                Price = propertyDto.Price,
-                CodeInternal = propertyDto.CodeInternal,
-                Year = propertyDto.Year,
-                IdOwner = propertyDto.IdOwner
-            };
+            IdProperty = id,
+            Name = propertyDto.Name,
+            Address = propertyDto.Address,
+            Price = propertyDto.Price,
+            CodeInternal = propertyDto.CodeInternal,
+            Year = propertyDto.Year,
+            IdOwner = propertyDto.IdOwner
+        };
 
-            var updatedProperty = await _propertyService.UpdatePropertyAsync(id, property);
-            
-            if (updatedProperty == null)
-            {
-                return NotFound(new { message = $"Property with ID {id} not found" });
-            }
+        var updatedProperty = await _propertyService.UpdatePropertyAsync(id, property);
 
-            var result = new PropertyDto
-            {
-                IdProperty = updatedProperty.IdProperty,
-                IdOwner = updatedProperty.IdOwner,
-                Name = updatedProperty.Name,
-                Address = updatedProperty.Address,
-                Price = updatedProperty.Price,
-                CodeInternal = updatedProperty.CodeInternal,
-                Year = updatedProperty.Year
-            };
-
-            return Ok(result);
-        }
-        catch (Exception ex)
+        var result = new PropertyDto
         {
-            return StatusCode(500, new { message = "Internal server error", error = ex.Message });
-        }
+            IdProperty = updatedProperty!.IdProperty,
+            IdOwner = updatedProperty.IdOwner,
+            Name = updatedProperty.Name,
+            Address = updatedProperty.Address,
+            Price = updatedProperty.Price,
+            CodeInternal = updatedProperty.CodeInternal,
+            Year = updatedProperty.Year
+        };
+
+        return Ok(result);
     }
 
     /// <summary>
@@ -178,20 +139,7 @@ public class PropertiesController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteProperty(int id)
     {
-        try
-        {
-            var deleted = await _propertyService.DeletePropertyAsync(id);
-            
-            if (!deleted)
-            {
-                return NotFound(new { message = $"Property with ID {id} not found" });
-            }
-
-            return NoContent();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { message = "Internal server error", error = ex.Message });
-        }
+        await _propertyService.DeletePropertyAsync(id);
+        return NoContent();
     }
 }

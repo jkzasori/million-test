@@ -1,5 +1,8 @@
 using MillionTestApi.Models;
-using MillionTestApi.Services;
+using MillionTestApi.Application.Services;
+using MillionTestApi.Domain.Repositories;
+using MillionTestApi.Infrastructure.Repositories;
+using MillionTestApi.Infrastructure.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,7 +10,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<DatabaseSettings>(
     builder.Configuration.GetSection("DatabaseSettings"));
 
-builder.Services.AddSingleton<IPropertyService, PropertyService>();
+// Dependency injection
+builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
+builder.Services.AddScoped<IPropertyService, PropertyService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -33,6 +38,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// Global exception handling middleware
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 // app.UseHttpsRedirection(); // Disabled for development
 app.UseCors("AllowFrontend");
