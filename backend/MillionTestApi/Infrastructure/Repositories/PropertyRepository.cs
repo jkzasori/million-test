@@ -4,6 +4,8 @@ using MillionTestApi.DTOs;
 using MillionTestApi.Models;
 using MillionTestApi.Domain.Repositories;
 using MillionTestApi.Domain.Exceptions;
+using MillionTestApi.Infrastructure.Services;
+using System.Text.Json;
 
 namespace MillionTestApi.Infrastructure.Repositories;
 
@@ -14,10 +16,12 @@ public class PropertyRepository : IPropertyRepository
     private readonly IMongoCollection<PropertyImage> _propertyImages;
     private readonly IMongoCollection<PropertyTrace> _propertyTraces;
     private readonly ILogger<PropertyRepository> _logger;
+    private readonly ICacheService _cacheService;
 
-    public PropertyRepository(IOptions<DatabaseSettings> databaseSettings, ILogger<PropertyRepository> logger)
+    public PropertyRepository(IOptions<DatabaseSettings> databaseSettings, ILogger<PropertyRepository> logger, ICacheService cacheService)
     {
         _logger = logger;
+        _cacheService = cacheService;
         
         try
         {
@@ -40,16 +44,28 @@ public class PropertyRepository : IPropertyRepository
     {
         try
         {
-            var filterBuilder = Builders<Property>.Filter.Empty;
-
-            if (!string.IsNullOrWhiteSpace(filter.Name))
+            // Create cache key based on filter parameters
+            var cacheKey = CacheKeys.GetPropertiesListKey(JsonSerializer.Serialize(filter));
+            
+            // Try to get from cache first
+            var cachedResult = await _cacheService.GetAsync<PropertyListResponseDto>(cacheKey);
+            if (cachedResult != null)
             {
-                filterBuilder &= Builders<Property>.Filter.Regex(p => p.Name, new MongoDB.Bson.BsonRegularExpression(filter.Name, "i"));
+                _logger.LogDebug("Cache hit for properties list");
+                return cachedResult;
             }
 
-            if (!string.IsNullOrWhiteSpace(filter.Address))
+            var filterBuilder = Builders<Property>.Filter.Empty;
+
+            // Use text search for better performance when available
+            if (!string.IsNullOrWhiteSpace(filter.Name) || !string.IsNullOrWhiteSpace(filter.Address))
             {
-                filterBuilder &= Builders<Property>.Filter.Regex(p => p.Address, new MongoDB.Bson.BsonRegularExpression(filter.Address, "i"));
+                var searchTerms = new List<string>();
+                if (!string.IsNullOrWhiteSpace(filter.Name)) searchTerms.Add(filter.Name);
+                if (!string.IsNullOrWhiteSpace(filter.Address)) searchTerms.Add(filter.Address);
+                
+                var searchText = string.Join(" ", searchTerms);
+                filterBuilder &= Builders<Property>.Filter.Text(searchText);
             }
 
             if (filter.MinPrice.HasValue)
@@ -62,13 +78,34 @@ public class PropertyRepository : IPropertyRepository
                 filterBuilder &= Builders<Property>.Filter.Lte(p => p.Price, filter.MaxPrice.Value);
             }
 
-            var totalCount = await _properties.CountDocumentsAsync(filterBuilder);
+            // Use aggregation for better performance with large datasets
+            var pipeline = new BsonDocument[]
+            {
+                new BsonDocument("$match", filterBuilder.Render(_properties.DocumentSerializer, _properties.Settings.SerializerRegistry)),
+                new BsonDocument("$facet", new BsonDocument
+                {
+                    { "data", new BsonArray
+                        {
+                            new BsonDocument("$sort", new BsonDocument("IdProperty", 1)),
+                            new BsonDocument("$skip", (filter.Page - 1) * filter.PageSize),
+                            new BsonDocument("$limit", filter.PageSize)
+                        }
+                    },
+                    { "count", new BsonArray
+                        {
+                            new BsonDocument("$count", "total")
+                        }
+                    }
+                })
+            };
+
+            var aggregationResult = await _properties.AggregateAsync<BsonDocument>(pipeline);
+            var result = await aggregationResult.FirstOrDefaultAsync();
             
-            var properties = await _properties
-                .Find(filterBuilder)
-                .Skip((filter.Page - 1) * filter.PageSize)
-                .Limit(filter.PageSize)
-                .ToListAsync();
+            var properties = result?["data"]?.AsBsonArray?.Select(doc => 
+                BsonSerializer.Deserialize<Property>(doc.AsBsonDocument)).ToList() ?? new List<Property>();
+            
+            var totalCount = result?["count"]?.AsBsonArray?.FirstOrDefault()?["total"]?.AsInt32 ?? 0;
 
             // Optimized: Get all owner IDs and property IDs in bulk
             var ownerIds = properties.Select(p => p.IdOwner).Distinct().ToList();
@@ -102,7 +139,7 @@ public class PropertyRepository : IPropertyRepository
                 OwnerName = ownerLookup.GetValueOrDefault(property.IdOwner)?.Name
             }).ToList();
 
-            return new PropertyListResponseDto
+            var response = new PropertyListResponseDto
             {
                 Properties = propertyDtos,
                 TotalCount = (int)totalCount,
@@ -110,6 +147,11 @@ public class PropertyRepository : IPropertyRepository
                 PageSize = filter.PageSize,
                 TotalPages = (int)Math.Ceiling((double)totalCount / filter.PageSize)
             };
+
+            // Cache the result for 10 minutes
+            await _cacheService.SetAsync(cacheKey, response, TimeSpan.FromMinutes(10));
+
+            return response;
         }
         catch (Exception ex)
         {
@@ -122,6 +164,15 @@ public class PropertyRepository : IPropertyRepository
     {
         try
         {
+            // Check cache first
+            var cacheKey = CacheKeys.GetPropertyDetailKey(id);
+            var cachedResult = await _cacheService.GetAsync<PropertyDetailDto>(cacheKey);
+            if (cachedResult != null)
+            {
+                _logger.LogDebug("Cache hit for property detail: {PropertyId}", id);
+                return cachedResult;
+            }
+
             var property = await _properties.Find(p => p.IdProperty == id).FirstOrDefaultAsync();
             if (property == null) 
             {
@@ -139,7 +190,7 @@ public class PropertyRepository : IPropertyRepository
             var images = imagesTask.Result;
             var traces = tracesTask.Result;
 
-            return new PropertyDetailDto
+            var result = new PropertyDetailDto
             {
                 IdProperty = property.IdProperty,
                 IdOwner = property.IdOwner,
@@ -175,6 +226,11 @@ public class PropertyRepository : IPropertyRepository
                     IdProperty = t.IdProperty
                 }).ToList()
             };
+
+            // Cache the result for 30 minutes
+            await _cacheService.SetAsync(cacheKey, result, TimeSpan.FromMinutes(30));
+
+            return result;
         }
         catch (PropertyNotFoundException)
         {

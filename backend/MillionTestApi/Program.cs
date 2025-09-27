@@ -3,12 +3,20 @@ using MillionTestApi.Application.Services;
 using MillionTestApi.Domain.Repositories;
 using MillionTestApi.Infrastructure.Repositories;
 using MillionTestApi.Infrastructure.Middleware;
+using MillionTestApi.Infrastructure.Services;
+using MillionTestApi.Infrastructure.Extensions;
+using MongoDB.Driver;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.Configure<DatabaseSettings>(
     builder.Configuration.GetSection("DatabaseSettings"));
+
+// Caching
+builder.Services.AddMemoryCache();
+builder.Services.AddScoped<ICacheService, MemoryCacheService>();
 
 // Dependency injection
 builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
@@ -31,6 +39,15 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// Initialize database indexes
+using (var scope = app.Services.CreateScope())
+{
+    var databaseSettings = scope.ServiceProvider.GetRequiredService<IOptions<DatabaseSettings>>();
+    var mongoClient = new MongoClient(databaseSettings.Value.ConnectionString);
+    var mongoDatabase = mongoClient.GetDatabase(databaseSettings.Value.DatabaseName);
+    await mongoDatabase.CreateIndexesAsync();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import LuxuryPropertyCard, { Property } from './LuxuryPropertyCard';
+import { VirtualizedList } from '../VirtualizedList';
 import styles from './PropertyGrid.module.css';
 
 interface PropertyGridProps {
@@ -8,6 +9,9 @@ interface PropertyGridProps {
   error?: string | null;
   className?: string;
   onPropertyView?: (property: Property) => void;
+  useVirtualization?: boolean;
+  itemHeight?: number;
+  containerHeight?: number;
 }
 
 const PropertyGrid: React.FC<PropertyGridProps> = ({

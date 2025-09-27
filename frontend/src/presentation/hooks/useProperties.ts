@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { PropertyListItem, PropertyFilters, PaginatedPropertyResult } from '../../domain/entities/Property';
 import { DependencyContainer } from '../../infrastructure/config/DependencyContainer';
 import { ErrorHandler } from '../../infrastructure/errors/ErrorHandler';
+import { useDebounce } from './useDebounce';
 
 interface UsePropertiesState {
   properties: PropertyListItem[];
@@ -50,7 +51,13 @@ export const useProperties = (
     filters: initialFilters,
   });
 
-  const propertyService = DependencyContainer.getInstance().getPropertyService();
+  const propertyService = useMemo(
+    () => DependencyContainer.getInstance().getPropertyService(),
+    []
+  );
+
+  // Debounce search filters to avoid excessive API calls
+  const debouncedFilters = useDebounce(initialFilters, 300);
 
   const loadProperties = useCallback(
     async (page: number = 1, size: number = 10, filters?: PropertyFilters) => {
