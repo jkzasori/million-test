@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { PropertyDetailDto } from '@/types/property';
@@ -14,6 +14,8 @@ const PropertyDetail: React.FC<PropertyDetailProps> = ({
   loading = false,
   className = ''
 }) => {
+  const [ownerImageError, setOwnerImageError] = useState(false);
+
   if (loading) {
     return (
       <div className={`property-detail-loading ${className}`}>
@@ -139,17 +141,25 @@ const PropertyDetail: React.FC<PropertyDetailProps> = ({
               <div className="detail-card">
                 <h3 className="detail-title">Property Owner</h3>
                 <div className="owner-info">
-                  {property.owner.photo && (
-                    <div className="owner-photo">
+                  <div className="owner-photo">
+                    {property.owner.photo && !ownerImageError ? (
                       <Image
                         src={property.owner.photo}
                         alt={property.owner.name}
                         width={60}
                         height={60}
                         className="owner-image"
+                        onError={() => setOwnerImageError(true)}
                       />
-                    </div>
-                  )}
+                    ) : (
+                      <div className="owner-image-fallback">
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="none" className="owner-icon">
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="2"/>
+                          <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2"/>
+                        </svg>
+                      </div>
+                    )}
+                  </div>
                   <div className="owner-details">
                     <h4 className="owner-name">{property.owner.name}</h4>
                     <p className="owner-address">{property.owner.address}</p>

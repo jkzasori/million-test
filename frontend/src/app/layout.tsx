@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter, Playfair_Display } from 'next/font/google';
 import './globals.css';
 import { ErrorBoundary } from '../presentation/components/ErrorBoundary';
+import FontLoader from '../components/FontLoader';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -38,29 +39,9 @@ export default function RootLayout({
             html.fonts-loaded { visibility: visible; opacity: 1; transition: opacity 0.1s; }
           `
         }} />
-        <script dangerouslySetInnerHTML={{
-          __html: `
-            (function() {
-              var html = document.documentElement;
-              
-              function showPage() {
-                html.classList.add('fonts-loaded');
-                html.style.visibility = 'visible';
-                html.style.opacity = '1';
-              }
-              
-              if (document.fonts && document.fonts.ready) {
-                document.fonts.ready.then(showPage);
-              } else {
-                setTimeout(showPage, 100);
-              }
-              
-              setTimeout(showPage, 500);
-            })();
-          `
-        }} />
       </head>
       <body className={inter.className}>
+        <FontLoader />
         <ErrorBoundary>
           {children}
         </ErrorBoundary>

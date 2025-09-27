@@ -1071,6 +1071,23 @@ p {
   border: 2px solid var(--color-border);
 }
 
+.owner-image-fallback {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+  background: var(--color-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-muted);
+}
+
+.owner-icon {
+  width: 32px;
+  height: 32px;
+}
+
 .owner-details {
   flex: 1;
 }
