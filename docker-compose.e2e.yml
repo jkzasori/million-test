@@ -1,0 +1,103 @@
+version: '3.8'
+
+services:
+  # MongoDB for E2E Testing
+  mongodb-e2e:
+    image: mongo:7.0
+    container_name: million-test-mongodb-e2e
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: million123
+      MONGO_INITDB_DATABASE: MillionTestPropertiesE2E
+    ports:
+      - "27018:27017"  # Different port to avoid conflicts
+    volumes:
+      - mongodb_e2e_data:/data/db
+      - ./backend/scripts/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    networks:
+      - million-test-e2e-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  # .NET Backend API for E2E Testing
+  backend-e2e:
+    build:
+      context: ./backend/MillionTestApi
+      dockerfile: Dockerfile
+    container_name: million-test-backend-e2e
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Testing
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=mongodb://admin:million123@mongodb-e2e:27017/MillionTestPropertiesE2E?authSource=admin
+      - CORS__AllowedOrigins=http://localhost:3001,http://frontend-e2e:3000
+    ports:
+      - "5001:5000"  # Different port to avoid conflicts
+    depends_on:
+      mongodb-e2e:
+        condition: service_healthy
+    networks:
+      - million-test-e2e-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Data Seeder for E2E Testing
+  data-seeder-e2e:
+    build:
+      context: ./backend/DataSeeder
+      dockerfile: Dockerfile
+    container_name: million-test-data-seeder-e2e
+    environment:
+      - ConnectionStrings__DefaultConnection=mongodb://admin:million123@mongodb-e2e:27017/MillionTestPropertiesE2E?authSource=admin
+    depends_on:
+      mongodb-e2e:
+        condition: service_healthy
+    networks:
+      - million-test-e2e-network
+    restart: "no"  # Run only once
+
+  # Next.js Frontend for E2E Testing
+  frontend-e2e:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: million-test-frontend-e2e
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://localhost:5001
+      - PORT=3000
+    ports:
+      - "3001:3000"  # Different port to avoid conflicts
+    depends_on:
+      backend-e2e:
+        condition: service_healthy
+    networks:
+      - million-test-e2e-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+# Docker networks
+networks:
+  million-test-e2e-network:
+    driver: bridge
+    name: million-test-e2e-network
+
+# Docker volumes
+volumes:
+  mongodb_e2e_data:
+    driver: local
+    name: million-test-mongodb-e2e-data

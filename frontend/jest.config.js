@@ -15,6 +15,8 @@ const customJestConfig = {
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',
     '!src/**/*.d.ts',
+    '!src/types/**',
+    '!src/**/*.stories.{js,jsx,ts,tsx}',
     '!src/**/*.module.css',
   ],
   coverageDirectory: 'coverage',
@@ -23,6 +25,14 @@ const customJestConfig = {
     '<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}',
     '<rootDir>/src/**/*.{test,spec}.{js,jsx,ts,tsx}',
   ],
+  coverageThreshold: {
+    global: {
+      branches: 70,
+      functions: 70,
+      lines: 70,
+      statements: 70,
+    },
+  },
 }
 
 module.exports = createJestConfig(customJestConfig)
