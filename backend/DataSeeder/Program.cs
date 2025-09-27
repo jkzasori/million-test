@@ -63,7 +63,7 @@ class Program
             .RuleFor(o => o.IdOwner, f => f.Random.Int(1, 1000000))
             .RuleFor(o => o.Name, f => f.Name.FullName())
             .RuleFor(o => o.Address, f => $"{f.Address.StreetAddress()}, {f.PickRandom(Cities)}, {f.Address.StateAbbr()} {f.Address.ZipCode()}")
-            .RuleFor(o => o.Photo, f => f.Internet.Avatar())
+            .RuleFor(o => o.Photo, f => $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(f.Name.FirstName())}+{Uri.EscapeDataString(f.Name.LastName())}&size=200&background=f0f0f0&color=333")
             .RuleFor(o => o.Birthday, f => f.Date.Between(new DateTime(1950, 1, 1), new DateTime(1995, 12, 31)));
 
         Console.WriteLine("👥 Generating 1,000 owners...");
