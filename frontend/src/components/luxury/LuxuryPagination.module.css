@@ -1,0 +1,260 @@
+.luxuryPagination {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+  background: white;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-border);
+  margin-top: 2rem;
+  box-shadow: var(--shadow-lg);
+}
+
+.paginationProgress {
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+}
+
+.progressBar {
+  position: relative;
+  height: 6px;
+  background: var(--color-surface);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: 3px;
+  transition: width 0.6s ease;
+  position: relative;
+}
+
+.progressFill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.3), 
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+.progressText {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.progressCurrent,
+.progressTotal {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.itemsInfo {
+  text-align: center;
+}
+
+.itemsText {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+}
+
+.paginationControls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.navBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-normal);
+}
+
+.navBtn:hover:not(.disabled) {
+  transform: translateY(-1px);
+  background: var(--color-surface);
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-md);
+}
+
+.navBtn.disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.navIcon {
+  font-size: 1.125rem;
+  transition: transform 0.3s ease;
+}
+
+.prevBtn:hover:not(.disabled) .navIcon {
+  transform: translateX(-2px);
+}
+
+.nextBtn:hover:not(.disabled) .navIcon {
+  transform: translateX(2px);
+}
+
+.pageNumbers {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pageBtn {
+  min-width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-normal);
+  font-size: 0.875rem;
+}
+
+.pageBtn:hover:not(.active):not(.dots):not(:disabled) {
+  transform: translateY(-1px);
+  background: var(--color-surface);
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-sm);
+}
+
+.pageBtn.active {
+  background: var(--color-accent);
+  color: white;
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.pageBtn.dots {
+  border: none;
+  cursor: default;
+  color: var(--color-text-secondary);
+}
+
+.pageBtn.dots:hover {
+  background: transparent;
+  transform: none;
+}
+
+.quickJump {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.jumpLabel {
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.jumpInput {
+  width: 4rem;
+  text-align: center;
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  border-radius: 0.5rem;
+}
+
+.jumpInput:focus {
+  box-shadow: 0 0 0 2px rgba(201, 169, 110, 0.3);
+  border-color: var(--color-accent);
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@media (max-width: 768px) {
+  .luxuryPagination {
+    padding: 1.5rem;
+    gap: 1.5rem;
+  }
+
+  .paginationControls {
+    gap: 0.75rem;
+  }
+
+  .navBtn {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  .navText {
+    display: none;
+  }
+
+  .pageBtn {
+    min-width: 2.5rem;
+    height: 2.5rem;
+    font-size: 0.8rem;
+  }
+
+  .pageNumbers {
+    gap: 0.25rem;
+  }
+
+  .quickJump {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .luxuryPagination {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .paginationControls {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .pageNumbers {
+    order: -1;
+  }
+
+  .progressText {
+    font-size: 0.8rem;
+  }
+
+  .itemsText {
+    font-size: 0.8rem;
+  }
+}
