@@ -112,7 +112,7 @@ describe('VirtualizedList', () => {
   it('should recalculate visible range when items change', () => {
     const { rerender } = render(<VirtualizedList {...defaultProps} />)
     
-    const initialItems = screen.getAllByTestId(/^item-/)
+    // const initialItems = screen.getAllByTestId(/^item-/)
     const newItems = mockItems.slice(0, 10)
     
     rerender(<VirtualizedList {...defaultProps} items={newItems} />)

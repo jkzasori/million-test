@@ -1,10 +1,10 @@
 using Microsoft.Extensions.Options;
-using MongoDB.Driver;
-using Moq;
-using NUnit.Framework;
 using MillionTestApi.DTOs;
 using MillionTestApi.Models;
 using MillionTestApi.Services;
+using MongoDB.Driver;
+using Moq;
+using NUnit.Framework;
 
 namespace MillionTestApi.Tests;
 
@@ -59,7 +59,7 @@ public class PropertyServiceTests
 
         // For this test to work properly, you would need to mock the MongoDB driver's Find methods
         // This is a simplified version showing the test structure
-        
+
         // Act & Assert would go here with proper mocking setup
         Assert.Pass("Test structure created - full implementation requires MongoDB driver mocking");
     }
@@ -69,11 +69,11 @@ public class PropertyServiceTests
     {
         // Arrange
         const int propertyId = 1;
-        var expectedProperty = new Property 
-        { 
-            IdProperty = propertyId, 
-            Name = "Test Property", 
-            Address = "Test Address", 
+        var expectedProperty = new Property
+        {
+            IdProperty = propertyId,
+            Name = "Test Property",
+            Address = "Test Address",
             Price = 100000,
             IdOwner = 1
         };

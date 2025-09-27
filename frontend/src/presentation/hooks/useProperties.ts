@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { PropertyListItem, PropertyFilters, PaginatedPropertyResult } from '../../domain/entities/Property';
 import { DependencyContainer } from '../../infrastructure/config/DependencyContainer';
 import { ErrorHandler } from '../../infrastructure/errors/ErrorHandler';
-import { useDebounce } from './useDebounce';
+// import { useDebounce } from './useDebounce';
 
 interface UsePropertiesState {
   properties: PropertyListItem[];
@@ -57,7 +57,7 @@ export const useProperties = (
   );
 
   // Debounce search filters to avoid excessive API calls
-  const debouncedFilters = useDebounce(initialFilters, 300);
+  // const debouncedFilters = useDebounce(initialFilters, 300);
 
   const loadProperties = useCallback(
     async (page: number = 1, size: number = 10, filters?: PropertyFilters) => {
@@ -140,6 +140,7 @@ export const useProperties = (
 
   useEffect(() => {
     loadProperties(initialPage, initialSize, initialFilters);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only run on mount
 
   return {

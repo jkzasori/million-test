@@ -1,6 +1,5 @@
-import React, { memo, useMemo } from 'react';
+import React from 'react';
 import LuxuryPropertyCard, { Property } from './LuxuryPropertyCard';
-import { VirtualizedList } from '../VirtualizedList';
 import styles from './PropertyGrid.module.css';
 
 interface PropertyGridProps {
@@ -61,7 +60,7 @@ const PropertyGrid: React.FC<PropertyGridProps> = ({
         <div className={styles.emptyIcon}>🏘️</div>
         <h3 className={`${styles.emptyTitle} text-luxury`}>No Properties Found</h3>
         <p className={styles.emptyMessage}>
-          We couldn't find any properties matching your search criteria. 
+          We couldn&apos;t find any properties matching your search criteria. 
           Try adjusting your filters or search terms.
         </p>
         <div className={styles.emptySuggestions}>

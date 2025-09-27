@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using MillionTestApi.Infrastructure.Services;
 using Moq;
 using NUnit.Framework;
-using MillionTestApi.Infrastructure.Services;
 
 namespace MillionTestApi.Tests.Infrastructure.Services;
 
@@ -104,11 +104,11 @@ public class CacheServiceTests
 
         // Assert
         _mockMemoryCache.Verify(x => x.Set(
-            key, 
-            value, 
-            It.Is<MemoryCacheEntryOptions>(o => 
+            key,
+            value,
+            It.Is<MemoryCacheEntryOptions>(o =>
                 o.AbsoluteExpirationRelativeToNow == TimeSpan.FromMinutes(15) &&
-                o.SlidingExpiration == TimeSpan.FromMinutes(5))), 
+                o.SlidingExpiration == TimeSpan.FromMinutes(5))),
             Times.Once);
     }
 
@@ -125,10 +125,10 @@ public class CacheServiceTests
 
         // Assert
         _mockMemoryCache.Verify(x => x.Set(
-            key, 
-            value, 
-            It.Is<MemoryCacheEntryOptions>(o => 
-                o.AbsoluteExpirationRelativeToNow == customExpiry)), 
+            key,
+            value,
+            It.Is<MemoryCacheEntryOptions>(o =>
+                o.AbsoluteExpirationRelativeToNow == customExpiry)),
             Times.Once);
     }
 
@@ -158,7 +158,7 @@ public class CacheServiceTests
 
         // Setup the cache service to track keys
         var cacheService = new MemoryCacheService(_mockMemoryCache.Object, _mockLogger.Object);
-        
+
         // Simulate adding keys to the internal tracking
         await cacheService.SetAsync("test-key-1", new TestObject { Id = 1, Name = "Test1" });
         await cacheService.SetAsync("test-key-2", new TestObject { Id = 2, Name = "Test2" });
@@ -210,7 +210,7 @@ public class CacheServiceTests
 
         // Act & Assert
         Assert.DoesNotThrowAsync(async () => await _cacheService.SetAsync(key, value));
-        
+
         // Verify error was logged
         _mockLogger.Verify(
             x => x.Log(

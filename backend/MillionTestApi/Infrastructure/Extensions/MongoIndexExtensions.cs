@@ -1,5 +1,5 @@
-using MongoDB.Driver;
 using MillionTestApi.Models;
+using MongoDB.Driver;
 
 namespace MillionTestApi.Infrastructure.Extensions;
 

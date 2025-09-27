@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, notFound } from 'next/navigation';
+import Link from 'next/link';
 import Header from '@/components/luxury/Header';
 import Footer from '@/components/luxury/Footer';
 import PropertyDetail from '@/components/luxury/PropertyDetail';
@@ -72,9 +73,9 @@ export default function PropertyDetailPage() {
               </svg>
               <h1 className={styles.errorTitle}>Something went wrong</h1>
               <p className={styles.errorMessage}>{error}</p>
-              <a href="/" className="btn-primary">
+              <Link href="/" className="btn-primary">
                 Back to Properties
-              </a>
+              </Link>
             </div>
           </div>
         </main>

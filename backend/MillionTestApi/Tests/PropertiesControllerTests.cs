@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using Moq;
-using NUnit.Framework;
+using MillionTestApi.Application.Services;
 using MillionTestApi.Controllers;
 using MillionTestApi.DTOs;
-using MillionTestApi.Application.Services;
+using Moq;
+using NUnit.Framework;
 
 namespace MillionTestApi.Tests;
 
@@ -47,7 +47,7 @@ public class PropertiesControllerTests
         var okResult = result.Result as OkObjectResult;
         Assert.That(okResult, Is.Not.Null);
         Assert.That(okResult!.Value, Is.EqualTo(expectedResponse));
-        
+
         _mockPropertyService.Verify(s => s.GetPropertiesAsync(It.Is<PropertyFilterDto>(f =>
             f.Name == "Test" &&
             f.Address == "Address" &&

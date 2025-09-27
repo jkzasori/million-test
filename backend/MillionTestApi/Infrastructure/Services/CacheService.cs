@@ -1,5 +1,5 @@
-using Microsoft.Extensions.Caching.Memory;
 using System.Text.Json;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace MillionTestApi.Infrastructure.Services;
 
@@ -134,7 +134,7 @@ public static class CacheKeys
 {
     public const string PropertiesList = "properties_list";
     public const string PropertyDetail = "property_detail";
-    
+
     public static string GetPropertiesListKey(string filters) => $"{PropertiesList}:{filters}";
     public static string GetPropertyDetailKey(int id) => $"{PropertyDetail}:{id}";
 }

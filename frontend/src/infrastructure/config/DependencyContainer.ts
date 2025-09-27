@@ -45,6 +45,6 @@ export class DependencyContainer {
 
   // Method to reset instance (useful for testing)
   static reset(): void {
-    DependencyContainer.instance = null as any;
+    DependencyContainer.instance = null as unknown as DependencyContainer;
   }
 }

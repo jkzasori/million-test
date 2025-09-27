@@ -1,10 +1,10 @@
+using MillionTestApi.Application.Services;
+using MillionTestApi.Domain.Repositories;
+using MillionTestApi.DTOs;
+using MillionTestApi.Infrastructure.Services;
+using MillionTestApi.Models;
 using Moq;
 using NUnit.Framework;
-using MillionTestApi.Application.Services;
-using MillionTestApi.Models;
-using MillionTestApi.Domain.Repositories;
-using MillionTestApi.Infrastructure.Services;
-using MillionTestApi.DTOs;
 
 namespace MillionTestApi.Tests.Application.Services;
 
@@ -30,14 +30,14 @@ public class PropertyServiceTests
         var filters = new PropertyFilterDto { Page = 1, PageSize = 10 };
         var expectedResult = new PaginatedResult<PropertyDto>
         {
-            Items = new List<PropertyDto> 
-            { 
-                new PropertyDto 
-                { 
-                    IdProperty = 1, 
-                    Name = "Test Property", 
-                    Price = 100000 
-                } 
+            Items = new List<PropertyDto>
+            {
+                new PropertyDto
+                {
+                    IdProperty = 1,
+                    Name = "Test Property",
+                    Price = 100000
+                }
             },
             TotalCount = 1,
             Page = 1,
@@ -65,11 +65,11 @@ public class PropertyServiceTests
         var filters = new PropertyFilterDto { Page = 1, PageSize = 10 };
         var properties = new List<Property>
         {
-            new Property 
-            { 
-                IdProperty = 1, 
-                Name = "Test Property", 
-                Address = "Test Address", 
+            new Property
+            {
+                IdProperty = 1,
+                Name = "Test Property",
+                Address = "Test Address",
                 Price = 100000,
                 CodeInternal = "TEST001",
                 Year = 2023
@@ -158,9 +158,9 @@ public class PropertyServiceTests
     public async Task GetPropertiesAsync_ShouldApplyFilters_WhenProvided()
     {
         // Arrange
-        var filters = new PropertyFilterDto 
-        { 
-            Page = 1, 
+        var filters = new PropertyFilterDto
+        {
+            Page = 1,
             PageSize = 5,
             MinPrice = 50000,
             MaxPrice = 200000,
@@ -187,10 +187,10 @@ public class PropertyServiceTests
 
         // Assert
         _mockPropertyRepository.Verify(x => x.GetPropertiesAsync(
-            It.Is<PropertyFilterDto>(f => 
-                f.MinPrice == 50000 && 
-                f.MaxPrice == 200000 && 
-                f.Year == 2023 && 
+            It.Is<PropertyFilterDto>(f =>
+                f.MinPrice == 50000 &&
+                f.MaxPrice == 200000 &&
+                f.Year == 2023 &&
                 f.Search == "test")), Times.Once);
     }
 }

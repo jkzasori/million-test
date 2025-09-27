@@ -1,4 +1,4 @@
-import { Property, PropertyListItem, PropertyFilters, PaginatedPropertyResult } from '../entities/Property';
+import { Property, PropertyFilters, PaginatedPropertyResult } from '../entities/Property';
 
 export interface PropertyRepository {
   getProperties(

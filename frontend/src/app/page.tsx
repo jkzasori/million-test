@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import Header from '@/presentation/components/luxury/Header';
 import HeroSection from '@/presentation/components/luxury/HeroSection';
 import FilterBar, { FilterState } from '@/presentation/components/luxury/FilterBar';
@@ -8,10 +8,25 @@ import PropertyGrid from '@/presentation/components/luxury/PropertyGrid';
 import LuxuryPagination from '@/presentation/components/luxury/LuxuryPagination';
 import Footer from '@/presentation/components/luxury/Footer';
 import { Property } from '@/presentation/components/luxury/LuxuryPropertyCard';
-import { PropertyFilters } from '@/domain/entities/Property';
 import { useProperties } from '@/presentation/hooks/useProperties';
+import { FilterUtils } from '@/presentation/utils/filterUtils';
+import { PropertyUtils } from '@/presentation/utils/propertyUtils';
 
+/**
+ * Configuration constants for the home page
+ */
+const PAGE_CONFIG = {
+  DEFAULT_PAGE_SIZE: 12,
+  INITIAL_PAGE: 1,
+  SALES_AMOUNT: '$2.1 BILLION'
+} as const;
+
+/**
+ * Home page component that displays property listings with filtering and pagination
+ * Implements Clean Code principles with clear separation of concerns
+ */
 export default function Home() {
+  // Local state for UI filters
   const [filters, setFilters] = useState<FilterState>({
     search: '',
     address: '',
@@ -19,91 +34,104 @@ export default function Home() {
     maxPrice: ''
   });
 
+  // Custom hook for property data management
   const {
     properties,
     loading,
     error,
     totalCount,
-    totalPages,
     currentPage,
     pageSize,
-    loadProperties,
-    searchProperties,
-    clearError
-  } = useProperties(1, 12);
+    loadProperties
+  } = useProperties(PAGE_CONFIG.INITIAL_PAGE, PAGE_CONFIG.DEFAULT_PAGE_SIZE);
 
-  const handleFiltersChange = (newFilters: FilterState) => {
+  /**
+   * Handles filter changes from the FilterBar component
+   * Converts UI filters to domain filters and triggers property loading
+   */
+  const handleFiltersChange = useCallback((newFilters: FilterState) => {
     setFilters(newFilters);
     
-    // Convert FilterState to PropertyFilters
-    const domainFilters: PropertyFilters = {
-      ...(newFilters.search && { name: newFilters.search }),
-      ...(newFilters.address && { address: newFilters.address }),
-      ...(newFilters.minPrice && { minPrice: parseInt(newFilters.minPrice) }),
-      ...(newFilters.maxPrice && { maxPrice: parseInt(newFilters.maxPrice) })
-    };
-    
-    loadProperties(1, 12, domainFilters);
-  };
+    const domainFilters = FilterUtils.createCleanFilters(newFilters);
+    loadProperties(PAGE_CONFIG.INITIAL_PAGE, PAGE_CONFIG.DEFAULT_PAGE_SIZE, domainFilters);
+  }, [loadProperties]);
 
-  const handlePageChange = (page: number) => {
-    const domainFilters: PropertyFilters = {
-      ...(filters.search && { name: filters.search }),
-      ...(filters.address && { address: filters.address }),
-      ...(filters.minPrice && { minPrice: parseInt(filters.minPrice) }),
-      ...(filters.maxPrice && { maxPrice: parseInt(filters.maxPrice) })
-    };
-    
+  /**
+   * Handles page navigation while preserving current filters
+   */
+  const handlePageChange = useCallback((page: number) => {
+    const domainFilters = FilterUtils.createCleanFilters(filters);
     loadProperties(page, pageSize, domainFilters);
-  };
+  }, [filters, loadProperties, pageSize]);
 
-  const handlePropertyView = (property: Property) => {
-    console.log('Viewing property:', property);
-    // TODO: Implement property detail view
-  };
+  /**
+   * Handles property view action - currently logs for demonstration
+   * In a real application, this would navigate to property details
+   */
+  const handlePropertyView = useCallback((property: Property) => {
+    console.log('Viewing property:', property.name, `(ID: ${property.idProperty})`);
+    // TODO: Implement navigation to property detail page
+    // router.push(`/properties/${property.idProperty}`);
+  }, []);
 
-  // Transform domain entities to component props
-  const transformedProperties: Property[] = properties.map(prop => ({
-    idProperty: prop.idProperty,
-    name: prop.name,
-    address: prop.address,
-    price: prop.price,
-    image: prop.mainImageUrl || '/placeholder-property.jpg',
-    ownerName: prop.ownerName || 'Private Owner',
-    codeInternal: prop.codeInternal,
-    year: prop.year
-  }));
+  /**
+   * Transforms domain properties to UI format using utility functions
+   */
+  const transformedProperties = useMemo(() => 
+    PropertyUtils.transformToUIProperties(properties),
+    [properties]
+  );
 
-  const pagination = {
-    totalCount,
-    page: currentPage,
-    pageSize,
-    totalPages,
-  };
+  /**
+   * Creates pagination configuration object
+   */
+  const paginationConfig = useMemo(() => 
+    PropertyUtils.createPaginationInfo(totalCount, currentPage, pageSize),
+    [totalCount, currentPage, pageSize]
+  );
+
+  /**
+   * Generates hero section statistics with current data
+   */
+  const heroStats = useMemo(() => [
+    { 
+      label: "PREMIUM", 
+      value: paginationConfig.totalCount.toLocaleString(), 
+      description: "PROPERTIES AVAILABLE" 
+    },
+    { 
+      label: "MORE THAN", 
+      value: PAGE_CONFIG.SALES_AMOUNT, 
+      description: "IN SALES" 
+    }
+  ], [paginationConfig.totalCount]);
+
+  /**
+   * Determines if pagination should be displayed
+   */
+  const shouldShowPagination = useMemo(() => 
+    !loading && !error && transformedProperties.length > 0 && paginationConfig.totalPages > 1,
+    [loading, error, transformedProperties.length, paginationConfig.totalPages]
+  );
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Header */}
+      {/* Navigation Header */}
       <Header />
       
-      {/* Hero Section */}
-      <HeroSection 
-        stats={[
-          { label: "PREMIUM", value: `${pagination.totalCount.toLocaleString()}`, description: "PROPERTIES AVAILABLE" },
-          { label: "MORE THAN", value: "$2.1 BILLION", description: "IN SALES" }
-        ]}
-      />
+      {/* Hero Section with Dynamic Stats */}
+      <HeroSection stats={heroStats} />
 
-      {/* Main Content */}
+      {/* Main Content Area */}
       <main className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-12">
-        {/* Filter Section */}
+        {/* Property Filtering */}
         <FilterBar 
           filters={filters}
           onFiltersChange={handleFiltersChange}
           loading={loading}
         />
 
-        {/* Property Grid */}
+        {/* Property Display Grid */}
         <PropertyGrid
           properties={transformedProperties}
           loading={loading}
@@ -111,17 +139,17 @@ export default function Home() {
           onPropertyView={handlePropertyView}
         />
 
-        {/* Pagination */}
-        {!loading && !error && properties.length > 0 && (
+        {/* Pagination Controls */}
+        {shouldShowPagination && (
           <LuxuryPagination
-            pagination={pagination}
+            pagination={paginationConfig}
             onPageChange={handlePageChange}
             loading={loading}
           />
         )}
       </main>
 
-      {/* Footer */}
+      {/* Site Footer */}
       <Footer />
     </div>
   );

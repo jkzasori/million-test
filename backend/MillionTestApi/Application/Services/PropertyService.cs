@@ -1,7 +1,7 @@
+using MillionTestApi.Domain.Exceptions;
+using MillionTestApi.Domain.Repositories;
 using MillionTestApi.DTOs;
 using MillionTestApi.Models;
-using MillionTestApi.Domain.Repositories;
-using MillionTestApi.Domain.Exceptions;
 
 namespace MillionTestApi.Application.Services;
 
@@ -19,77 +19,77 @@ public class PropertyService : IPropertyService
     public async Task<PropertyListResponseDto> GetPropertiesAsync(PropertyFilterDto filter)
     {
         _logger.LogInformation("Getting properties with filter: {@Filter}", filter);
-        
+
         ValidateFilter(filter);
-        
+
         var result = await _propertyRepository.GetPropertiesAsync(filter);
-        
-        _logger.LogInformation("Retrieved {Count} properties out of {Total}", 
+
+        _logger.LogInformation("Retrieved {Count} properties out of {Total}",
             result.Properties.Count, result.TotalCount);
-            
+
         return result;
     }
 
     public async Task<PropertyDetailDto?> GetPropertyByIdAsync(int id)
     {
         _logger.LogInformation("Getting property by ID: {PropertyId}", id);
-        
+
         if (id <= 0)
         {
             throw new ValidationException("Property ID must be greater than 0");
         }
 
         var result = await _propertyRepository.GetPropertyByIdAsync(id);
-        
+
         _logger.LogInformation("Retrieved property: {PropertyId}", id);
-        
+
         return result;
     }
 
     public async Task<Property> CreatePropertyAsync(Property property)
     {
         _logger.LogInformation("Creating property: {PropertyId}", property.IdProperty);
-        
+
         ValidateProperty(property);
-        
+
         var result = await _propertyRepository.CreatePropertyAsync(property);
-        
+
         _logger.LogInformation("Property created successfully: {PropertyId}", result.IdProperty);
-        
+
         return result;
     }
 
     public async Task<Property?> UpdatePropertyAsync(int id, Property property)
     {
         _logger.LogInformation("Updating property: {PropertyId}", id);
-        
+
         if (id <= 0)
         {
             throw new ValidationException("Property ID must be greater than 0");
         }
-        
+
         ValidateProperty(property);
-        
+
         var result = await _propertyRepository.UpdatePropertyAsync(id, property);
-        
+
         _logger.LogInformation("Property updated successfully: {PropertyId}", id);
-        
+
         return result;
     }
 
     public async Task<bool> DeletePropertyAsync(int id)
     {
         _logger.LogInformation("Deleting property: {PropertyId}", id);
-        
+
         if (id <= 0)
         {
             throw new ValidationException("Property ID must be greater than 0");
         }
 
         var result = await _propertyRepository.DeletePropertyAsync(id);
-        
+
         _logger.LogInformation("Property deleted successfully: {PropertyId}", id);
-        
+
         return result;
     }
 

@@ -1,12 +1,12 @@
-using MillionTestApi.Models;
+using Microsoft.Extensions.Options;
 using MillionTestApi.Application.Services;
 using MillionTestApi.Domain.Repositories;
-using MillionTestApi.Infrastructure.Repositories;
-using MillionTestApi.Infrastructure.Middleware;
-using MillionTestApi.Infrastructure.Services;
 using MillionTestApi.Infrastructure.Extensions;
+using MillionTestApi.Infrastructure.Middleware;
+using MillionTestApi.Infrastructure.Repositories;
+using MillionTestApi.Infrastructure.Services;
+using MillionTestApi.Models;
 using MongoDB.Driver;
-using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 

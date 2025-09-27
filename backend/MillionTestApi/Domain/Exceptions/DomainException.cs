@@ -14,7 +14,7 @@ public class PropertyNotFoundException : DomainException
     public override string Code => "PROPERTY_NOT_FOUND";
     public override int StatusCode => 404;
 
-    public PropertyNotFoundException(int propertyId) 
+    public PropertyNotFoundException(int propertyId)
         : base($"Property with ID {propertyId} was not found.") { }
 }
 

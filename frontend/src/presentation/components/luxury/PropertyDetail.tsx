@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { PropertyDetailDto, PropertyImageDto, PropertyTraceDto } from '@/types/property';
+import { PropertyDetailDto } from '@/types/property';
 
 interface PropertyDetailProps {
   property: PropertyDetailDto;

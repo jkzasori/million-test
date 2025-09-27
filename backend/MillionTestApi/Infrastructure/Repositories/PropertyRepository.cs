@@ -1,11 +1,11 @@
-using Microsoft.Extensions.Options;
-using MongoDB.Driver;
-using MillionTestApi.DTOs;
-using MillionTestApi.Models;
-using MillionTestApi.Domain.Repositories;
-using MillionTestApi.Domain.Exceptions;
-using MillionTestApi.Infrastructure.Services;
 using System.Text.Json;
+using Microsoft.Extensions.Options;
+using MillionTestApi.Domain.Exceptions;
+using MillionTestApi.Domain.Repositories;
+using MillionTestApi.DTOs;
+using MillionTestApi.Infrastructure.Services;
+using MillionTestApi.Models;
+using MongoDB.Driver;
 
 namespace MillionTestApi.Infrastructure.Repositories;
 
@@ -22,7 +22,7 @@ public class PropertyRepository : IPropertyRepository
     {
         _logger = logger;
         _cacheService = cacheService;
-        
+
         try
         {
             var mongoClient = new MongoClient(databaseSettings.Value.ConnectionString);
@@ -46,7 +46,7 @@ public class PropertyRepository : IPropertyRepository
         {
             // Create cache key based on filter parameters
             var cacheKey = CacheKeys.GetPropertiesListKey(JsonSerializer.Serialize(filter));
-            
+
             // Try to get from cache first
             var cachedResult = await _cacheService.GetAsync<PropertyListResponseDto>(cacheKey);
             if (cachedResult != null)
@@ -63,7 +63,7 @@ public class PropertyRepository : IPropertyRepository
                 var searchTerms = new List<string>();
                 if (!string.IsNullOrWhiteSpace(filter.Name)) searchTerms.Add(filter.Name);
                 if (!string.IsNullOrWhiteSpace(filter.Address)) searchTerms.Add(filter.Address);
-                
+
                 var searchText = string.Join(" ", searchTerms);
                 filterBuilder &= Builders<Property>.Filter.Text(searchText);
             }
@@ -101,10 +101,10 @@ public class PropertyRepository : IPropertyRepository
 
             var aggregationResult = await _properties.AggregateAsync<BsonDocument>(pipeline);
             var result = await aggregationResult.FirstOrDefaultAsync();
-            
-            var properties = result?["data"]?.AsBsonArray?.Select(doc => 
+
+            var properties = result?["data"]?.AsBsonArray?.Select(doc =>
                 BsonSerializer.Deserialize<Property>(doc.AsBsonDocument)).ToList() ?? new List<Property>();
-            
+
             var totalCount = result?["count"]?.AsBsonArray?.FirstOrDefault()?["total"]?.AsInt32 ?? 0;
 
             // Optimized: Get all owner IDs and property IDs in bulk
@@ -115,7 +115,7 @@ public class PropertyRepository : IPropertyRepository
             var owners = await _owners
                 .Find(o => ownerIds.Contains(o.IdOwner))
                 .ToListAsync();
-            
+
             var images = await _propertyImages
                 .Find(img => propertyIds.Contains(img.IdProperty) && img.Enabled)
                 .ToListAsync();
@@ -174,7 +174,7 @@ public class PropertyRepository : IPropertyRepository
             }
 
             var property = await _properties.Find(p => p.IdProperty == id).FirstOrDefaultAsync();
-            if (property == null) 
+            if (property == null)
             {
                 throw new PropertyNotFoundException(id);
             }
@@ -275,7 +275,7 @@ public class PropertyRepository : IPropertyRepository
         {
             property.IdProperty = id;
             var result = await _properties.ReplaceOneAsync(p => p.IdProperty == id, property);
-            
+
             if (result.MatchedCount == 0)
             {
                 throw new PropertyNotFoundException(id);
@@ -300,7 +300,7 @@ public class PropertyRepository : IPropertyRepository
         try
         {
             var result = await _properties.DeleteOneAsync(p => p.IdProperty == id);
-            
+
             if (result.DeletedCount == 0)
             {
                 throw new PropertyNotFoundException(id);

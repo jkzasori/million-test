@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Options;
-using MongoDB.Driver;
 using MillionTestApi.DTOs;
 using MillionTestApi.Models;
+using MongoDB.Driver;
 
 namespace MillionTestApi.Services;
 
@@ -48,7 +48,7 @@ public class PropertyService : IPropertyService
         }
 
         var totalCount = await _properties.CountDocumentsAsync(filterBuilder);
-        
+
         var properties = await _properties
             .Find(filterBuilder)
             .Skip((filter.Page - 1) * filter.PageSize)
@@ -56,7 +56,7 @@ public class PropertyService : IPropertyService
             .ToListAsync();
 
         var propertyDtos = new List<PropertyDto>();
-        
+
         foreach (var property in properties)
         {
             var owner = await _owners.Find(o => o.IdOwner == property.IdOwner).FirstOrDefaultAsync();
