@@ -3,11 +3,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Property } from '../../domain/entities/Property';
 import { DependencyContainer } from '../../infrastructure/config/DependencyContainer';
+import { ErrorHandler } from '../../infrastructure/errors/ErrorHandler';
 
 interface UsePropertyState {
   property: Property | null;
   loading: boolean;
   error: string | null;
+  errorDetails: ReturnType<typeof ErrorHandler.handle> | null;
 }
 
 interface UsePropertyResult extends UsePropertyState {
@@ -21,6 +23,7 @@ export const useProperty = (propertyId?: number): UsePropertyResult => {
     property: null,
     loading: Boolean(propertyId),
     error: null,
+    errorDetails: null,
   });
 
   const [currentId, setCurrentId] = useState<number | undefined>(propertyId);
@@ -29,7 +32,7 @@ export const useProperty = (propertyId?: number): UsePropertyResult => {
 
   const loadProperty = useCallback(
     async (id: number) => {
-      setState(prev => ({ ...prev, loading: true, error: null }));
+      setState(prev => ({ ...prev, loading: true, error: null, errorDetails: null }));
       setCurrentId(id);
 
       try {
@@ -40,20 +43,23 @@ export const useProperty = (propertyId?: number): UsePropertyResult => {
           loading: false,
         }));
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to load property';
+        const errorDetails = ErrorHandler.handle(error);
         setState(prev => ({
           ...prev,
           loading: false,
-          error: errorMessage,
+          error: errorDetails.userFriendlyMessage,
+          errorDetails,
           property: null,
         }));
+
+        console.error('Failed to load property:', error);
       }
     },
     [propertyService]
   );
 
   const clearError = useCallback(() => {
-    setState(prev => ({ ...prev, error: null }));
+    setState(prev => ({ ...prev, error: null, errorDetails: null }));
   }, []);
 
   const refetch = useCallback(async () => {

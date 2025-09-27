@@ -1,10 +1,12 @@
 'use client';
 
 import { useParams, notFound } from 'next/navigation';
+import Link from 'next/link';
 import Header from '@/presentation/components/luxury/Header';
 import Footer from '@/presentation/components/luxury/Footer';
 import PropertyDetail from '@/presentation/components/luxury/PropertyDetail';
 import { useProperty } from '@/presentation/hooks/useProperty';
+import { Property } from '@/domain/entities/Property';
 import styles from './page.module.css';
 
 export default function PropertyDetailPage() {
@@ -44,9 +46,9 @@ export default function PropertyDetailPage() {
               </svg>
               <h1 className={styles.errorTitle}>Something went wrong</h1>
               <p className={styles.errorMessage}>{error}</p>
-              <a href="/" className="btn-primary">
+              <Link href="/" className="btn-primary">
                 Back to Properties
-              </a>
+              </Link>
             </div>
           </div>
         </main>
@@ -62,7 +64,7 @@ export default function PropertyDetailPage() {
       <main className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-12">
         {loading || !property ? (
           <PropertyDetail 
-            property={{} as PropertyDetailDto} 
+            property={{} as Property} 
             loading={loading} 
           />
         ) : (

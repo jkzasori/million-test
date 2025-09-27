@@ -3,11 +3,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { PropertyListItem, PropertyFilters, PaginatedPropertyResult } from '../../domain/entities/Property';
 import { DependencyContainer } from '../../infrastructure/config/DependencyContainer';
+import { ErrorHandler } from '../../infrastructure/errors/ErrorHandler';
 
 interface UsePropertiesState {
   properties: PropertyListItem[];
   loading: boolean;
   error: string | null;
+  errorDetails: ReturnType<typeof ErrorHandler.handle> | null;
   totalCount: number;
   totalPages: number;
   currentPage: number;
@@ -30,6 +32,7 @@ export const useProperties = (
     properties: [],
     loading: true,
     error: null,
+    errorDetails: null,
     totalCount: 0,
     totalPages: 0,
     currentPage: initialPage,
@@ -67,12 +70,16 @@ export const useProperties = (
           loading: false,
         }));
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to load properties';
+        const errorDetails = ErrorHandler.handle(error);
         setState(prev => ({
           ...prev,
           loading: false,
-          error: errorMessage,
+          error: errorDetails.userFriendlyMessage,
+          errorDetails,
         }));
+
+        // Log error for monitoring
+        console.error('Failed to load properties:', error);
       }
     },
     [propertyService]
@@ -96,19 +103,23 @@ export const useProperties = (
           loading: false,
         }));
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to search properties';
+        const errorDetails = ErrorHandler.handle(error);
         setState(prev => ({
           ...prev,
           loading: false,
-          error: errorMessage,
+          error: errorDetails.userFriendlyMessage,
+          errorDetails,
         }));
+
+        // Log error for monitoring
+        console.error('Failed to search properties:', error);
       }
     },
     [propertyService]
   );
 
   const clearError = useCallback(() => {
-    setState(prev => ({ ...prev, error: null }));
+    setState(prev => ({ ...prev, error: null, errorDetails: null }));
   }, []);
 
   const refetch = useCallback(async () => {

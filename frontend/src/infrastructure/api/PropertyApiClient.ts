@@ -1,14 +1,11 @@
 import { PropertyDetailDto, PropertyFilterDto, PropertyListResponseDto } from '../../types/property';
-
-export class ApiError extends Error {
-  status: number;
-  
-  constructor(message: string, status: number) {
-    super(message);
-    this.status = status;
-    this.name = 'ApiError';
-  }
-}
+import { 
+  NetworkError, 
+  ServerError, 
+  TimeoutError, 
+  NotFoundError,
+  ValidationError 
+} from '../../domain/errors/DomainErrors';
 
 export interface ApiClientConfig {
   baseUrl: string;
@@ -63,23 +60,43 @@ export class PropertyApiClient {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ message: 'Unknown error' }));
-        throw new ApiError(error.message || `HTTP ${response.status}`, response.status);
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        const errorMessage = errorData.message || `HTTP ${response.status}`;
+        
+        switch (response.status) {
+          case 400:
+            throw new ValidationError(errorMessage);
+          case 404:
+            throw new NotFoundError('Resource', endpoint);
+          case 408:
+            throw new TimeoutError(errorMessage);
+          case 500:
+          case 502:
+          case 503:
+          case 504:
+            throw new ServerError(errorMessage, response.status);
+          default:
+            throw new ServerError(errorMessage, response.status);
+        }
       }
 
       return response.json();
-    } catch (error) {
+    } catch (error: unknown) {
       clearTimeout(timeoutId);
       
-      if (error instanceof ApiError) {
+      // Re-throw domain errors
+      if (error instanceof ValidationError || 
+          error instanceof NotFoundError || 
+          error instanceof TimeoutError || 
+          error instanceof ServerError) {
         throw error;
       }
       
-      if (error.name === 'AbortError') {
-        throw new ApiError('Request timeout', 408);
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new TimeoutError('Request timeout');
       }
       
-      throw new ApiError('Network error', 0);
+      throw new NetworkError('Network connection failed');
     }
   }
 }
