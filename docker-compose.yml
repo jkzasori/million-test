@@ -1,0 +1,103 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: million-test-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: million123
+      MONGO_INITDB_DATABASE: MillionTestProperties
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./backend/scripts/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    networks:
+      - million-test-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  # .NET Backend API
+  backend:
+    build:
+      context: ./backend/MillionTestApi
+      dockerfile: Dockerfile
+    container_name: million-test-backend
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=mongodb://admin:million123@mongodb:27017/MillionTestProperties?authSource=admin
+      - CORS__AllowedOrigins=http://localhost:3000,http://frontend:3000
+    ports:
+      - "5000:5000"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - million-test-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Data Seeder (runs once to populate database)
+  data-seeder:
+    build:
+      context: ./backend/DataSeeder
+      dockerfile: Dockerfile
+    container_name: million-test-data-seeder
+    environment:
+      - ConnectionStrings__DefaultConnection=mongodb://admin:million123@mongodb:27017/MillionTestProperties?authSource=admin
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - million-test-network
+    restart: "no"  # Run only once
+
+  # Next.js Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: million-test-frontend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://localhost:5000
+      - PORT=3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - million-test-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+# Docker networks
+networks:
+  million-test-network:
+    driver: bridge
+    name: million-test-network
+
+# Docker volumes
+volumes:
+  mongodb_data:
+    driver: local
+    name: million-test-mongodb-data

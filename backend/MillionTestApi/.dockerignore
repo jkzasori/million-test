@@ -1,0 +1,23 @@
+# .dockerignore for .NET API
+**/.git
+**/.gitignore
+**/.DS_Store
+**/bin
+**/obj
+**/out
+**/publish
+**/.vs
+**/.vscode
+**/*.user
+**/*.suo
+**/.cache
+**/node_modules
+**/npm-debug.log
+**/coverage
+**/.nyc_output
+**/Dockerfile*
+**/.dockerignore
+**/README.md
+**/LICENSE
+**/.editorconfig
+**/*.md
