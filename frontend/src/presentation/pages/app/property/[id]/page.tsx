@@ -1,22 +1,50 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useParams, notFound } from 'next/navigation';
-import Header from '@/presentation/components/luxury/Header';
-import Footer from '@/presentation/components/luxury/Footer';
-import PropertyDetail from '@/presentation/components/luxury/PropertyDetail';
-import { useProperty } from '@/presentation/hooks/useProperty';
+import Header from '@/components/luxury/Header';
+import Footer from '@/components/luxury/Footer';
+import PropertyDetail from '@/components/luxury/PropertyDetail';
+import { PropertyDetailDto } from '@/types/property';
+import { propertyService, ApiError } from '@/services/api';
 import styles from './page.module.css';
 
 export default function PropertyDetailPage() {
   const params = useParams();
-  
-  const id = parseInt(params.id as string);
-  if (isNaN(id)) {
-    notFound();
-    return null;
-  }
+  const [property, setProperty] = useState<PropertyDetailDto | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const { property, loading, error } = useProperty(id);
+  useEffect(() => {
+    const fetchProperty = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const id = parseInt(params.id as string);
+        if (isNaN(id)) {
+          notFound();
+          return;
+        }
+
+        const propertyData = await propertyService.getProperty(id);
+        setProperty(propertyData);
+      } catch (err) {
+        console.error('Error fetching property:', err);
+        if (err instanceof ApiError && err.status === 404) {
+          notFound();
+        } else {
+          setError(err instanceof Error ? err.message : 'Failed to load property');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (params.id) {
+      fetchProperty();
+    }
+  }, [params.id]);
 
   if (error) {
     return (

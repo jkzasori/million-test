@@ -1,103 +1,84 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Header from '@/components/luxury/Header';
-import HeroSection from '@/components/luxury/HeroSection';
-import FilterBar, { FilterState } from '@/components/luxury/FilterBar';
-import PropertyGrid from '@/components/luxury/PropertyGrid';
-import LuxuryPagination from '@/components/luxury/LuxuryPagination';
-import Footer from '@/components/luxury/Footer';
-import { Property } from '@/components/luxury/LuxuryPropertyCard';
-import { PropertyFilterDto, PropertyListResponseDto } from '@/types/property';
-import { propertyService } from '@/services/api';
+import { useState } from 'react';
+import Header from '@/presentation/components/luxury/Header';
+import HeroSection from '@/presentation/components/luxury/HeroSection';
+import FilterBar, { FilterState } from '@/presentation/components/luxury/FilterBar';
+import PropertyGrid from '@/presentation/components/luxury/PropertyGrid';
+import LuxuryPagination from '@/presentation/components/luxury/LuxuryPagination';
+import Footer from '@/presentation/components/luxury/Footer';
+import { Property } from '@/presentation/components/luxury/LuxuryPropertyCard';
+import { PropertyFilters } from '@/domain/entities/Property';
+import { useProperties } from '@/presentation/hooks/useProperties';
 
 export default function Home() {
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [currentFilter, setCurrentFilter] = useState<PropertyFilterDto>({
-    page: 1,
-    pageSize: 12,
-  });
   const [filters, setFilters] = useState<FilterState>({
     search: '',
     address: '',
     minPrice: '',
     maxPrice: ''
   });
-  const [pagination, setPagination] = useState({
-    totalCount: 0,
-    page: 1,
-    pageSize: 12,
-    totalPages: 0,
-  });
 
-  const fetchProperties = async (filter: PropertyFilterDto) => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const response: PropertyListResponseDto = await propertyService.getProperties(filter);
-      
-      // Transform PropertyDto to Property format
-      const transformedProperties: Property[] = response.properties.map(prop => ({
-        idProperty: prop.idProperty,
-        name: prop.name,
-        address: prop.address,
-        price: prop.price,
-        image: prop.image || '/placeholder-property.jpg',
-        ownerName: prop.ownerName || 'Private Owner',
-        codeInternal: prop.codeInternal,
-        year: prop.year
-      }));
-      
-      setProperties(transformedProperties);
-      setPagination({
-        totalCount: response.totalCount,
-        page: response.page,
-        pageSize: response.pageSize,
-        totalPages: response.totalPages,
-      });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load properties');
-      setProperties([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProperties(currentFilter);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const {
+    properties,
+    loading,
+    error,
+    totalCount,
+    totalPages,
+    currentPage,
+    pageSize,
+    loadProperties,
+    searchProperties,
+    clearError
+  } = useProperties(1, 12);
 
   const handleFiltersChange = (newFilters: FilterState) => {
     setFilters(newFilters);
     
-    // Convert FilterState to PropertyFilterDto
-    const filter: PropertyFilterDto = {
-      page: 1,
-      pageSize: currentFilter.pageSize,
+    // Convert FilterState to PropertyFilters
+    const domainFilters: PropertyFilters = {
       ...(newFilters.search && { name: newFilters.search }),
       ...(newFilters.address && { address: newFilters.address }),
       ...(newFilters.minPrice && { minPrice: parseInt(newFilters.minPrice) }),
       ...(newFilters.maxPrice && { maxPrice: parseInt(newFilters.maxPrice) })
     };
     
-    setCurrentFilter(filter);
-    fetchProperties(filter);
+    loadProperties(1, 12, domainFilters);
   };
 
-
   const handlePageChange = (page: number) => {
-    const newFilter = { ...currentFilter, page };
-    setCurrentFilter(newFilter);
-    fetchProperties(newFilter);
+    const domainFilters: PropertyFilters = {
+      ...(filters.search && { name: filters.search }),
+      ...(filters.address && { address: filters.address }),
+      ...(filters.minPrice && { minPrice: parseInt(filters.minPrice) }),
+      ...(filters.maxPrice && { maxPrice: parseInt(filters.maxPrice) })
+    };
+    
+    loadProperties(page, pageSize, domainFilters);
   };
 
   const handlePropertyView = (property: Property) => {
     console.log('Viewing property:', property);
     // TODO: Implement property detail view
+  };
+
+  // Transform domain entities to component props
+  const transformedProperties: Property[] = properties.map(prop => ({
+    idProperty: prop.idProperty,
+    name: prop.name,
+    address: prop.address,
+    price: prop.price,
+    image: prop.mainImageUrl || '/placeholder-property.jpg',
+    ownerName: prop.ownerName || 'Private Owner',
+    codeInternal: prop.codeInternal,
+    year: prop.year
+  }));
+
+  const pagination = {
+    totalCount,
+    page: currentPage,
+    pageSize,
+    totalPages,
   };
 
   return (
@@ -124,7 +105,7 @@ export default function Home() {
 
         {/* Property Grid */}
         <PropertyGrid
-          properties={properties}
+          properties={transformedProperties}
           loading={loading}
           error={error}
           onPropertyView={handlePropertyView}
