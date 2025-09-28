@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using NUnit.Framework;
 using System.Net;
@@ -11,9 +10,13 @@ namespace MillionTestApi.Tests.Integration;
 [TestFixture]
 public class PropertiesControllerIntegrationTests
 {
-    private WebApplicationFactory<Program> _factory;
-    private HttpClient _client;
-    private IMongoDatabase _testDatabase;
+    private WebApplicationFactory<Program> _factory = null!;
+    private HttpClient _client = null!;
+    private IMongoDatabase _testDatabase = null!;
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -67,13 +70,10 @@ public class PropertiesControllerIntegrationTests
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         
         var content = await response.Content.ReadAsStringAsync();
-        var result = JsonSerializer.Deserialize<PaginatedResult<Property>>(content, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        });
+        var result = JsonSerializer.Deserialize<PaginatedResult<Property>>(content, JsonOptions);
 
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.Data, Is.Empty);
+        Assert.That(result!.Data, Is.Empty);
         Assert.That(result.TotalCount, Is.EqualTo(0));
     }
 
@@ -90,14 +90,11 @@ public class PropertiesControllerIntegrationTests
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         
         var content = await response.Content.ReadAsStringAsync();
-        var result = JsonSerializer.Deserialize<PaginatedResult<Property>>(content, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        });
+        var result = JsonSerializer.Deserialize<PaginatedResult<Property>>(content, JsonOptions);
 
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.Data, Is.Not.Empty);
-        Assert.That(result.TotalCount, Is.GreaterThan(0));
+        Assert.That(result!.Data, Is.Not.Empty);
+        Assert.That(result!.TotalCount, Is.GreaterThan(0));
         Assert.That(result.Data.Count, Is.LessThanOrEqualTo(10));
     }
 
@@ -114,13 +111,10 @@ public class PropertiesControllerIntegrationTests
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         
         var content = await response.Content.ReadAsStringAsync();
-        var result = JsonSerializer.Deserialize<PropertyDetailDto>(content, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        });
+        var result = JsonSerializer.Deserialize<PropertyDetailDto>(content, JsonOptions);
 
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.IdProperty, Is.EqualTo(testProperty.IdProperty));
+        Assert.That(result!.IdProperty, Is.EqualTo(testProperty.IdProperty));
         Assert.That(result.Name, Is.EqualTo(testProperty.Name));
     }
 
@@ -147,13 +141,10 @@ public class PropertiesControllerIntegrationTests
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         
         var content = await response.Content.ReadAsStringAsync();
-        var result = JsonSerializer.Deserialize<PaginatedResult<Property>>(content, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        });
+        var result = JsonSerializer.Deserialize<PaginatedResult<Property>>(content, JsonOptions);
 
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.Data.All(p => p.Price >= 100000 && p.Price <= 500000), Is.True);
+        Assert.That(result!.Data.All(p => p.Price >= 100000 && p.Price <= 500000), Is.True);
     }
 
     [Test]

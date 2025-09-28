@@ -12,7 +12,7 @@ public class CacheServiceTests
     private Mock<IMemoryCache> _mockMemoryCache = null!;
     private Mock<ILogger<MemoryCacheService>> _mockLogger = null!;
     private MemoryCacheService _cacheService = null!;
-    private readonly Dictionary<object, object> _cacheStore = new();
+    private readonly Dictionary<object, object> _cacheStore = [];
 
     [SetUp]
     public void Setup()
@@ -23,8 +23,8 @@ public class CacheServiceTests
 
         // Setup memory cache mock to use a dictionary for storage
         _mockMemoryCache
-            .Setup(x => x.TryGetValue(It.IsAny<object>(), out It.Ref<object>.IsAny))
-            .Returns((object key, out object value) =>
+            .Setup(x => x.TryGetValue(It.IsAny<object>(), out It.Ref<object?>.IsAny))
+            .Returns((object key, out object? value) =>
             {
                 return _cacheStore.TryGetValue(key, out value!);
             });
@@ -61,7 +61,7 @@ public class CacheServiceTests
 
         // Assert
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.Id, Is.EqualTo(expectedValue.Id));
+        Assert.That(result!.Id, Is.EqualTo(expectedValue.Id));
         Assert.That(result.Name, Is.EqualTo(expectedValue.Name));
     }
 
@@ -179,7 +179,7 @@ public class CacheServiceTests
         // Arrange
         var key = "test-key";
         _mockMemoryCache
-            .Setup(x => x.TryGetValue(It.IsAny<object>(), out It.Ref<object>.IsAny))
+            .Setup(x => x.TryGetValue(It.IsAny<object>(), out It.Ref<object?>.IsAny))
             .Throws(new Exception("Cache error"));
 
         // Act
@@ -199,7 +199,7 @@ public class CacheServiceTests
     }
 
     [Test]
-    public async Task SetAsync_ShouldHandleException_AndNotThrow()
+    public void SetAsync_ShouldHandleException_AndNotThrow()
     {
         // Arrange
         var key = "test-key";

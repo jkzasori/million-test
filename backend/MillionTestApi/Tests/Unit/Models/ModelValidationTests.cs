@@ -108,7 +108,6 @@ public class ModelValidationTests
             Address = "Test Address",
             MinPrice = 100000,
             MaxPrice = 500000,
-            Year = 2020,
             Page = 1,
             PageSize = 10
         };
@@ -314,9 +313,9 @@ public class ModelValidationTests
             CodeInternal = "DETAIL001",
             Year = 2022,
             IdOwner = 1,
-            Owner = new Owner { IdOwner = 1, Name = "Owner Name" },
-            Images = new List<PropertyImage>(),
-            Traces = new List<PropertyTrace>()
+            Owner = new OwnerDto { IdOwner = 1, Name = "Owner Name" },
+            Images = new List<PropertyImageDto>(),
+            Traces = new List<PropertyTraceDto>()
         };
 
         // Act

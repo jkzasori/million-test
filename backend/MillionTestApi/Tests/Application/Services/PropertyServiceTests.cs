@@ -1,7 +1,7 @@
+using Microsoft.Extensions.Logging;
 using MillionTestApi.Application.Services;
 using MillionTestApi.Domain.Repositories;
 using MillionTestApi.DTOs;
-using MillionTestApi.Infrastructure.Services;
 using MillionTestApi.Models;
 using Moq;
 using NUnit.Framework;
@@ -12,15 +12,15 @@ namespace MillionTestApi.Tests.Application.Services;
 public class PropertyServiceTests
 {
     private Mock<IPropertyRepository> _mockPropertyRepository = null!;
-    private Mock<ICacheService> _mockCacheService = null!;
+    private Mock<ILogger<PropertyService>> _mockLogger = null!;
     private PropertyService _propertyService = null!;
 
     [SetUp]
     public void Setup()
     {
         _mockPropertyRepository = new Mock<IPropertyRepository>();
-        _mockCacheService = new Mock<ICacheService>();
-        _propertyService = new PropertyService(_mockPropertyRepository.Object, _mockCacheService.Object);
+        _mockLogger = new Mock<ILogger<PropertyService>>();
+        _propertyService = new PropertyService(_mockPropertyRepository.Object, _mockLogger.Object);
     }
 
     [Test]
@@ -28,9 +28,9 @@ public class PropertyServiceTests
     {
         // Arrange
         var filters = new PropertyFilterDto { Page = 1, PageSize = 10 };
-        var expectedResult = new PaginatedResult<PropertyDto>
+        var expectedResult = new PropertyListResponseDto
         {
-            Items = new List<PropertyDto>
+            Properties = new List<PropertyDto>
             {
                 new PropertyDto
                 {
@@ -44,8 +44,8 @@ public class PropertyServiceTests
             PageSize = 10
         };
 
-        _mockCacheService
-            .Setup(x => x.GetAsync<PaginatedResult<PropertyDto>>(It.IsAny<string>()))
+        _mockPropertyRepository
+            .Setup(x => x.GetPropertiesAsync(It.IsAny<PropertyFilterDto>()))
             .ReturnsAsync(expectedResult);
 
         // Act
@@ -53,52 +53,47 @@ public class PropertyServiceTests
 
         // Assert
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.Items.Count(), Is.EqualTo(1));
-        Assert.That(result.Items.First().Name, Is.EqualTo("Test Property"));
-        _mockPropertyRepository.Verify(x => x.GetPropertiesAsync(It.IsAny<PropertyFilterDto>()), Times.Never);
+        Assert.That(result.Properties.Count, Is.EqualTo(1));
+        Assert.That(result.Properties.First().Name, Is.EqualTo("Test Property"));
+        _mockPropertyRepository.Verify(x => x.GetPropertiesAsync(It.IsAny<PropertyFilterDto>()), Times.Once);
     }
 
     [Test]
-    public async Task GetPropertiesAsync_ShouldFetchFromRepository_WhenCacheMiss()
+    public async Task GetPropertiesAsync_ShouldCallRepository_AndReturnResults()
     {
         // Arrange
         var filters = new PropertyFilterDto { Page = 1, PageSize = 10 };
-        var properties = new List<Property>
+        var expectedResult = new PropertyListResponseDto
         {
-            new Property
+            Properties = new List<PropertyDto>
             {
-                IdProperty = 1,
-                Name = "Test Property",
-                Address = "Test Address",
-                Price = 100000,
-                CodeInternal = "TEST001",
-                Year = 2023
-            }
+                new PropertyDto
+                {
+                    IdProperty = 1,
+                    Name = "Test Property",
+                    Address = "Test Address",
+                    Price = 100000,
+                    CodeInternal = "TEST001",
+                    Year = 2023
+                }
+            },
+            TotalCount = 1,
+            Page = 1,
+            PageSize = 10
         };
-
-        _mockCacheService
-            .Setup(x => x.GetAsync<PaginatedResult<PropertyDto>>(It.IsAny<string>()))
-            .ReturnsAsync((PaginatedResult<PropertyDto>?)null);
 
         _mockPropertyRepository
             .Setup(x => x.GetPropertiesAsync(filters))
-            .ReturnsAsync(new PaginatedResult<Property>
-            {
-                Items = properties,
-                TotalCount = 1,
-                Page = 1,
-                PageSize = 10
-            });
+            .ReturnsAsync(expectedResult);
 
         // Act
         var result = await _propertyService.GetPropertiesAsync(filters);
 
         // Assert
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.Items.Count(), Is.EqualTo(1));
-        Assert.That(result.Items.First().Name, Is.EqualTo("Test Property"));
+        Assert.That(result.Properties.Count, Is.EqualTo(1));
+        Assert.That(result.Properties.First().Name, Is.EqualTo("Test Property"));
         _mockPropertyRepository.Verify(x => x.GetPropertiesAsync(filters), Times.Once);
-        _mockCacheService.Verify(x => x.SetAsync(It.IsAny<string>(), It.IsAny<PaginatedResult<PropertyDto>>(), It.IsAny<TimeSpan?>()), Times.Once);
     }
 
     [Test]
@@ -116,20 +111,26 @@ public class PropertyServiceTests
             Year = 2023
         };
 
-        _mockCacheService
-            .Setup(x => x.GetAsync<PropertyDetailDto>(It.IsAny<string>()))
-            .ReturnsAsync((PropertyDetailDto?)null);
+        var propertyDetailDto = new PropertyDetailDto
+        {
+            IdProperty = propertyId,
+            Name = "Test Property",
+            Address = "Test Address",
+            Price = 100000,
+            CodeInternal = "TEST001",
+            Year = 2023
+        };
 
         _mockPropertyRepository
             .Setup(x => x.GetPropertyByIdAsync(propertyId))
-            .ReturnsAsync(property);
+            .ReturnsAsync(propertyDetailDto);
 
         // Act
         var result = await _propertyService.GetPropertyByIdAsync(propertyId);
 
         // Assert
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.IdProperty, Is.EqualTo(propertyId));
+        Assert.That(result!.IdProperty, Is.EqualTo(propertyId));
         Assert.That(result.Name, Is.EqualTo("Test Property"));
     }
 
@@ -139,13 +140,9 @@ public class PropertyServiceTests
         // Arrange
         var propertyId = 999;
 
-        _mockCacheService
-            .Setup(x => x.GetAsync<PropertyDetailDto>(It.IsAny<string>()))
-            .ReturnsAsync((PropertyDetailDto?)null);
-
         _mockPropertyRepository
             .Setup(x => x.GetPropertyByIdAsync(propertyId))
-            .ReturnsAsync((Property?)null);
+            .ReturnsAsync((PropertyDetailDto?)null);
 
         // Act
         var result = await _propertyService.GetPropertyByIdAsync(propertyId);
@@ -164,23 +161,21 @@ public class PropertyServiceTests
             PageSize = 5,
             MinPrice = 50000,
             MaxPrice = 200000,
-            Year = 2023,
-            Search = "test"
+            Name = "test",
+            Address = "test address"
         };
 
-        _mockCacheService
-            .Setup(x => x.GetAsync<PaginatedResult<PropertyDto>>(It.IsAny<string>()))
-            .ReturnsAsync((PaginatedResult<PropertyDto>?)null);
+        var expectedResult = new PropertyListResponseDto
+        {
+            Properties = new List<PropertyDto>(),
+            TotalCount = 0,
+            Page = 1,
+            PageSize = 5
+        };
 
         _mockPropertyRepository
             .Setup(x => x.GetPropertiesAsync(filters))
-            .ReturnsAsync(new PaginatedResult<Property>
-            {
-                Items = new List<Property>(),
-                TotalCount = 0,
-                Page = 1,
-                PageSize = 5
-            });
+            .ReturnsAsync(expectedResult);
 
         // Act
         await _propertyService.GetPropertiesAsync(filters);
@@ -190,7 +185,7 @@ public class PropertyServiceTests
             It.Is<PropertyFilterDto>(f =>
                 f.MinPrice == 50000 &&
                 f.MaxPrice == 200000 &&
-                f.Year == 2023 &&
-                f.Search == "test")), Times.Once);
+                f.Name == "test" &&
+                f.Address == "test address")), Times.Once);
     }
 }

@@ -33,8 +33,8 @@ export class PropertyUtils {
       name: property.name || 'Unnamed Property',
       address: property.address || 'Address not provided',
       price: property.price || 0,
-      image: property.mainImageUrl || this.DEFAULT_IMAGE,
-      ownerName: property.ownerName || this.DEFAULT_OWNER,
+      image: property.mainImageUrl || PropertyUtils.DEFAULT_IMAGE,
+      ownerName: property.ownerName || PropertyUtils.DEFAULT_OWNER,
       codeInternal: property.codeInternal || '',
       year: property.year || new Date().getFullYear()
     };

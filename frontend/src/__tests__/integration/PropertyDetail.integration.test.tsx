@@ -1,10 +1,11 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import { useRouter } from 'next/navigation';
+import '@testing-library/jest-dom';
 import PropertyDetailPage from '@/app/properties/[id]/page';
 
-// Mock Next.js router
+// Mock Next.js navigation hooks
 jest.mock('next/navigation', () => ({
+  useParams: jest.fn(),
   useRouter: jest.fn(),
 }));
 
@@ -22,12 +23,13 @@ global.fetch = mockFetch;
 // Mock property detail data
 const mockPropertyDetail = {
   idProperty: 1,
+  idOwner: 1,
   name: 'Beautiful House',
   address: '123 Main St',
   price: 500000,
   codeInternal: 'PROP001',
   year: 2020,
-  idOwner: 1,
+  image: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be',
   owner: {
     idOwner: 1,
     name: 'John Doe',
@@ -69,6 +71,8 @@ const mockPropertyDetail = {
   ]
 };
 
+const { useParams, useRouter } = require('next/navigation');
+
 describe('PropertyDetail Integration Tests', () => {
   const mockPush = jest.fn();
 
@@ -78,6 +82,9 @@ describe('PropertyDetail Integration Tests', () => {
     (useRouter as jest.Mock).mockReturnValue({
       push: mockPush,
       back: jest.fn(),
+    });
+    (useParams as jest.Mock).mockReturnValue({
+      id: '1'
     });
   });
 
@@ -89,11 +96,11 @@ describe('PropertyDetail Integration Tests', () => {
     });
 
     // Act
-    render(<PropertyDetailPage params={{ id: '1' }} />);
+    render(<PropertyDetailPage />);
 
     // Assert - Property Information
     await waitFor(() => {
-      expect(screen.getByText('Beautiful House')).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Beautiful House' })).toBeInTheDocument();
     });
 
     expect(screen.getByText('123 Main St')).toBeInTheDocument();
@@ -118,6 +125,7 @@ describe('PropertyDetail Integration Tests', () => {
 
   it('handles property not found error', async () => {
     // Arrange
+    (useParams as jest.Mock).mockReturnValue({ id: '999' });
     mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 404,
@@ -125,7 +133,7 @@ describe('PropertyDetail Integration Tests', () => {
     });
 
     // Act
-    render(<PropertyDetailPage params={{ id: '999' }} />);
+    render(<PropertyDetailPage />);
 
     // Assert
     await waitFor(() => {
@@ -142,7 +150,7 @@ describe('PropertyDetail Integration Tests', () => {
     });
 
     // Act
-    render(<PropertyDetailPage params={{ id: '1' }} />);
+    render(<PropertyDetailPage />);
 
     // Assert
     await waitFor(() => {
@@ -160,7 +168,7 @@ describe('PropertyDetail Integration Tests', () => {
     mockFetch.mockReturnValueOnce(delayedPromise);
 
     // Act
-    render(<PropertyDetailPage params={{ id: '1' }} />);
+    render(<PropertyDetailPage />);
 
     // Assert loading state
     expect(screen.getByText(/cargando/i)).toBeInTheDocument();
@@ -191,7 +199,7 @@ describe('PropertyDetail Integration Tests', () => {
     });
 
     // Act
-    render(<PropertyDetailPage params={{ id: '1' }} />);
+    render(<PropertyDetailPage />);
 
     // Assert
     await waitFor(() => {
@@ -215,7 +223,7 @@ describe('PropertyDetail Integration Tests', () => {
     });
 
     // Act
-    render(<PropertyDetailPage params={{ id: '1' }} />);
+    render(<PropertyDetailPage />);
 
     // Assert
     await waitFor(() => {
@@ -234,7 +242,7 @@ describe('PropertyDetail Integration Tests', () => {
     });
 
     // Act
-    render(<PropertyDetailPage params={{ id: '1' }} />);
+    render(<PropertyDetailPage />);
 
     // Assert
     await waitFor(() => {
@@ -262,7 +270,7 @@ describe('PropertyDetail Integration Tests', () => {
     });
 
     // Act
-    render(<PropertyDetailPage params={{ id: '1' }} />);
+    render(<PropertyDetailPage />);
 
     // Assert
     await waitFor(() => {
@@ -281,7 +289,7 @@ describe('PropertyDetail Integration Tests', () => {
     });
 
     // Act
-    render(<PropertyDetailPage params={{ id: '1' }} />);
+    render(<PropertyDetailPage />);
 
     // Assert
     await waitFor(() => {
@@ -295,13 +303,14 @@ describe('PropertyDetail Integration Tests', () => {
 
   it('makes correct API call with property ID', async () => {
     // Arrange
+    (useParams as jest.Mock).mockReturnValue({ id: '123' });
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => mockPropertyDetail,
     });
 
     // Act
-    render(<PropertyDetailPage params={{ id: '123' }} />);
+    render(<PropertyDetailPage />);
 
     // Assert
     await waitFor(() => {

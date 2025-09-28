@@ -87,7 +87,7 @@ public class PropertyApiE2ETests : IDisposable
         });
 
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.Properties, Is.Not.Empty);
+        Assert.That(result!.Properties, Is.Not.Empty);
         Assert.That(result.Properties.Count, Is.LessThanOrEqualTo(5));
         Assert.That(result.TotalCount, Is.GreaterThan(0));
         Assert.That(result.Page, Is.EqualTo(1));
@@ -110,7 +110,7 @@ public class PropertyApiE2ETests : IDisposable
         });
 
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.Properties.All(p => p.Price >= 200000 && p.Price <= 400000), Is.True);
+        Assert.That(result!.Properties.All(p => p.Price >= 200000 && p.Price <= 400000), Is.True);
     }
 
     [Test]
@@ -139,7 +139,7 @@ public class PropertyApiE2ETests : IDisposable
         });
 
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.IdProperty, Is.EqualTo(propertyId));
+        Assert.That(result!.IdProperty, Is.EqualTo(propertyId));
         Assert.That(result.Name, Is.Not.Empty);
         Assert.That(result.Address, Is.Not.Empty);
         Assert.That(result.Price, Is.GreaterThan(0));
@@ -173,7 +173,7 @@ public class PropertyApiE2ETests : IDisposable
         });
 
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.Properties.All(p => p.Name.Contains("Villa", StringComparison.OrdinalIgnoreCase)), Is.True);
+        Assert.That(result!.Properties.All(p => p.Name.Contains("Villa", StringComparison.OrdinalIgnoreCase)), Is.True);
     }
 
     [Test]
@@ -230,6 +230,7 @@ public class PropertyApiE2ETests : IDisposable
             PropertyNameCaseInsensitive = true
         });
 
+        Assert.That(createdProperty, Is.Not.Null);
         Assert.That(createdProperty!.Name, Is.EqualTo("E2E Test Property"));
         Assert.That(createdProperty.Price, Is.EqualTo(350000));
 
@@ -261,6 +262,7 @@ public class PropertyApiE2ETests : IDisposable
             PropertyNameCaseInsensitive = true
         });
 
+        Assert.That(updatedPropertyResult, Is.Not.Null);
         Assert.That(updatedPropertyResult!.Name, Is.EqualTo("Updated E2E Test Property"));
         Assert.That(updatedPropertyResult.Price, Is.EqualTo(400000));
 

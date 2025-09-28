@@ -88,7 +88,7 @@ public class PropertiesControllerUnitTests
             .ReturnsAsync(expectedResponse);
 
         // Act
-        var result = await _controller.GetProperties(null, null, null, null, null, null);
+        var result = await _controller.GetProperties(null, null, null, null, 1, 12);
 
         // Assert
         Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
@@ -104,18 +104,20 @@ public class PropertiesControllerUnitTests
     }
 
     [Test]
-    public async Task GetProperties_ServiceThrowsException_ShouldReturn500()
+    public async Task GetProperties_ServiceThrowsValidationException_ShouldReturnBadRequest()
     {
         // Arrange
         _mockPropertyService
             .Setup(s => s.GetPropertiesAsync(It.IsAny<PropertyFilterDto>()))
-            .ThrowsAsync(new Exception("Database connection failed"));
+            .ThrowsAsync(new MillionTestApi.Domain.Exceptions.ValidationException("Invalid filter parameters"));
 
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<Exception>(async () =>
-            await _controller.GetProperties(null, null, null, null, null, null));
+        // Act
+        var result = await _controller.GetProperties(null, null, null, null, 1, 10);
 
-        Assert.That(exception.Message, Is.EqualTo("Database connection failed"));
+        // Assert
+        Assert.That(result.Result, Is.InstanceOf<BadRequestObjectResult>());
+        var badRequestResult = result.Result as BadRequestObjectResult;
+        Assert.That(badRequestResult!.Value, Is.EqualTo("Invalid filter parameters"));
     }
 
     [Test]
@@ -132,19 +134,19 @@ public class PropertiesControllerUnitTests
             CodeInternal = "PROP001",
             Year = 2020,
             IdOwner = 1,
-            Owner = new Owner 
+            Owner = new OwnerDto 
             { 
                 IdOwner = 1, 
                 Name = "John Doe", 
                 Address = "Owner Address" 
             },
-            Images = new List<PropertyImage>
+            Images = new List<PropertyImageDto>
             {
-                new PropertyImage { IdPropertyImage = 1, IdProperty = propertyId, File = "image1.jpg", Enabled = true }
+                new PropertyImageDto { IdPropertyImage = 1, IdProperty = propertyId, File = "image1.jpg", Enabled = true }
             },
-            Traces = new List<PropertyTrace>
+            Traces = new List<PropertyTraceDto>
             {
-                new PropertyTrace { IdPropertyTrace = 1, IdProperty = propertyId, DateSale = DateTime.Now, Name = "Sale", Value = 500000, Tax = 25000 }
+                new PropertyTraceDto { IdPropertyTrace = 1, IdProperty = propertyId, DateSale = DateTime.Now, Name = "Sale", Value = 500000, Tax = 25000 }
             }
         };
 
@@ -153,7 +155,7 @@ public class PropertiesControllerUnitTests
             .ReturnsAsync(expectedProperty);
 
         // Act
-        var result = await _controller.GetProperty(propertyId);
+        var result = await _controller.GetPropertyById(propertyId);
 
         // Assert
         Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
@@ -173,7 +175,7 @@ public class PropertiesControllerUnitTests
             .ReturnsAsync((PropertyDetailDto?)null);
 
         // Act
-        var result = await _controller.GetProperty(invalidId);
+        var result = await _controller.GetPropertyById(invalidId);
 
         // Assert
         Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
@@ -216,7 +218,7 @@ public class PropertiesControllerUnitTests
         // Assert
         Assert.That(result.Result, Is.InstanceOf<CreatedAtActionResult>());
         var createdResult = result.Result as CreatedAtActionResult;
-        Assert.That(createdResult!.ActionName, Is.EqualTo(nameof(_controller.GetProperty)));
+        Assert.That(createdResult!.ActionName, Is.EqualTo(nameof(_controller.GetPropertyById)));
         Assert.That(createdResult.RouteValues!["id"], Is.EqualTo(10));
         Assert.That(createdResult.Value, Is.EqualTo(createdProperty));
 
@@ -368,26 +370,28 @@ public class PropertiesControllerUnitTests
     }
 
     [Test]
-    public async Task DeleteProperty_ServiceThrowsException_ShouldPropagateException()
+    public async Task DeleteProperty_ServiceThrowsValidationException_ShouldReturnBadRequest()
     {
         // Arrange
-        const int propertyId = 1;
+        const int propertyId = 0; // Invalid ID
         _mockPropertyService
             .Setup(s => s.DeletePropertyAsync(propertyId))
-            .ThrowsAsync(new Exception("Database error"));
+            .ThrowsAsync(new MillionTestApi.Domain.Exceptions.ValidationException("Property ID must be greater than 0"));
 
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<Exception>(async () =>
-            await _controller.DeleteProperty(propertyId));
+        // Act
+        var result = await _controller.DeleteProperty(propertyId);
 
-        Assert.That(exception.Message, Is.EqualTo("Database error"));
+        // Assert
+        Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
+        var badRequestResult = result as BadRequestObjectResult;
+        Assert.That(badRequestResult!.Value, Is.EqualTo("Property ID must be greater than 0"));
     }
 
     [Test]
     public void Constructor_WithNullService_ShouldThrowArgumentNullException()
     {
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => new PropertiesController(null!));
+        Assert.Throws<ArgumentNullException>(() => new PropertiesController(null!, Mock.Of<ILogger<PropertiesController>>()));
     }
 
     [Test]

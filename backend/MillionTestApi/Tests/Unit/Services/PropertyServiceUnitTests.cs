@@ -64,7 +64,7 @@ public class PropertyServiceUnitTests
         mockClient.Setup(x => x.GetDatabase("test_db", null))
                  .Returns(_mockDatabase.Object);
 
-        _propertyService = new PropertyService(mockClient.Object, mockOptions.Object);
+        _propertyService = new PropertyService(mockOptions.Object);
     }
 
     [Test]
@@ -244,12 +244,12 @@ public class PropertyServiceUnitTests
 
         // Assert
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.IdProperty, Is.EqualTo(propertyId));
+        Assert.That(result!.IdProperty, Is.EqualTo(propertyId));
         Assert.That(result.Name, Is.EqualTo("Test Property"));
         Assert.That(result.Owner, Is.Not.Null);
-        Assert.That(result.Owner.Name, Is.EqualTo("John Doe"));
-        Assert.That(result.Images.Count, Is.EqualTo(2));
-        Assert.That(result.Traces.Count, Is.EqualTo(1));
+        Assert.That(result.Owner!.Name, Is.EqualTo("John Doe"));
+        Assert.That(result.Images!.Count, Is.EqualTo(2));
+        Assert.That(result.Traces!.Count, Is.EqualTo(1));
     }
 
     [Test]
@@ -353,7 +353,7 @@ public class PropertyServiceUnitTests
 
         // Assert
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.Name, Is.EqualTo("Updated Property"));
+        Assert.That(result!.Name, Is.EqualTo("Updated Property"));
         Assert.That(result.Address, Is.EqualTo("Updated Address"));
         Assert.That(result.Price, Is.EqualTo(150000));
     }
@@ -418,6 +418,6 @@ public class PropertyServiceUnitTests
                  .ReturnsAsync(data);
 
         mockCursor.Setup(x => x.FirstOrDefaultAsync(It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(data.FirstOrDefault());
+                 .Returns(Task.FromResult(data.FirstOrDefault()!));
     }
 }

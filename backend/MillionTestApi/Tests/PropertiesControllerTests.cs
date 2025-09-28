@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using MillionTestApi.Application.Services;
 using MillionTestApi.Controllers;
 using MillionTestApi.DTOs;
@@ -11,13 +12,15 @@ namespace MillionTestApi.Tests;
 public class PropertiesControllerTests
 {
     private Mock<IPropertyService> _mockPropertyService = null!;
+    private Mock<ILogger<PropertiesController>> _mockLogger = null!;
     private PropertiesController _controller = null!;
 
     [SetUp]
     public void Setup()
     {
         _mockPropertyService = new Mock<IPropertyService>();
-        _controller = new PropertiesController(_mockPropertyService.Object);
+        _mockLogger = new Mock<ILogger<PropertiesController>>();
+        _controller = new PropertiesController(_mockPropertyService.Object, _mockLogger.Object);
     }
 
     [Test]
@@ -75,7 +78,7 @@ public class PropertiesControllerTests
                            .ReturnsAsync(expectedProperty);
 
         // Act
-        var result = await _controller.GetProperty(propertyId);
+        var result = await _controller.GetPropertyById(propertyId);
 
         // Assert
         Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
@@ -93,7 +96,7 @@ public class PropertiesControllerTests
                            .ReturnsAsync((PropertyDetailDto?)null);
 
         // Act
-        var result = await _controller.GetProperty(invalidId);
+        var result = await _controller.GetPropertyById(invalidId);
 
         // Assert
         Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
@@ -131,7 +134,7 @@ public class PropertiesControllerTests
         Assert.That(result.Result, Is.InstanceOf<CreatedAtActionResult>());
         var createdResult = result.Result as CreatedAtActionResult;
         Assert.That(createdResult, Is.Not.Null);
-        Assert.That(createdResult!.ActionName, Is.EqualTo(nameof(_controller.GetProperty)));
+        Assert.That(createdResult!.ActionName, Is.EqualTo(nameof(_controller.GetPropertyById)));
     }
 
     [Test]
