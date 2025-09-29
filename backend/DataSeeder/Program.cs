@@ -42,8 +42,11 @@ class Program
         Console.WriteLine("🏠 Million Test Properties - Data Seeder");
         Console.WriteLine("==========================================");
         
-        var client = new MongoClient("mongodb://localhost:27017");
-        var database = client.GetDatabase("million_test_dev");
+        var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection") ?? "mongodb://localhost:27017";
+        var databaseName = connectionString.Contains("million_test_prod") ? "million_test_prod" : "million_test_dev";
+        
+        var client = new MongoClient(connectionString);
+        var database = client.GetDatabase(databaseName);
         
         // Drop existing collections to start fresh
         await database.DropCollectionAsync("owners");
