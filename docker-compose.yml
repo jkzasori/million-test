@@ -34,10 +34,10 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:5001
-      - ConnectionStrings__DefaultConnection=mongodb://admin:million123@mongodb:27017/MillionTestProperties?authSource=admin
+      - ConnectionStrings__DefaultConnection=mongodb://admin:million123@mongodb:27017/million_test_prod?authSource=admin
       - CORS__AllowedOrigins=http://localhost:3000,http://frontend:3000
     ports:
-      - "5001:5000"
+      - "5001:5001"
     depends_on:
       mongodb:
         condition: service_healthy
@@ -57,7 +57,7 @@ services:
       dockerfile: Dockerfile
     container_name: million-test-data-seeder
     environment:
-      - ConnectionStrings__DefaultConnection=mongodb://admin:million123@mongodb:27017/MillionTestProperties?authSource=admin
+      - ConnectionStrings__DefaultConnection=mongodb://admin:million123@mongodb:27017/million_test_prod?authSource=admin
     depends_on:
       mongodb:
         condition: service_healthy
