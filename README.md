@@ -5,11 +5,11 @@ A full-stack real estate application built with .NET Core 9, MongoDB, and Next.j
 ## 📸 Screenshots
 
 ### Home Page - Property Search
-![Home Page](docs/images/home.png)
+![Home Page](home.png)
 *Premium luxury UI with glass morphism effects, advanced search filters, and responsive property grid*
 
 ### Property Detail View
-![Property Detail](docs/images/detail.png)
+![Property Detail](detail.png)
 *Detailed property information with image gallery, owner details, and transaction history*
 
 ## 🏗️ Architecture Overview
