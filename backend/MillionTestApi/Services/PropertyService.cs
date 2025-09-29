@@ -25,6 +25,9 @@ public class PropertyService : IPropertyService
 
     public async Task<PropertyListResponseDto> GetPropertiesAsync(PropertyFilterDto filter)
     {
+        if (filter == null)
+            throw new ArgumentNullException(nameof(filter));
+
         var filterBuilder = Builders<Property>.Filter.Empty;
 
         if (!string.IsNullOrWhiteSpace(filter.Name))
@@ -137,6 +140,9 @@ public class PropertyService : IPropertyService
 
     public async Task<Property> CreatePropertyAsync(Property property)
     {
+        if (property == null)
+            throw new ArgumentNullException(nameof(property));
+
         await _properties.InsertOneAsync(property);
         return property;
     }

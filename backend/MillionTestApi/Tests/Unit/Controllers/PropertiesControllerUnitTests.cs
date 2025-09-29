@@ -180,7 +180,7 @@ public class PropertiesControllerUnitTests
         // Assert
         Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
         var notFoundResult = result.Result as NotFoundObjectResult;
-        Assert.That(notFoundResult!.Value, Is.EqualTo($"Property with ID {invalidId} not found"));
+        Assert.That(notFoundResult!.Value, Is.EqualTo($"Property with ID {invalidId} was not found"));
     }
 
     [Test]
@@ -220,7 +220,10 @@ public class PropertiesControllerUnitTests
         var createdResult = result.Result as CreatedAtActionResult;
         Assert.That(createdResult!.ActionName, Is.EqualTo(nameof(_controller.GetPropertyById)));
         Assert.That(createdResult.RouteValues!["id"], Is.EqualTo(10));
-        Assert.That(createdResult.Value, Is.EqualTo(createdProperty));
+        var returnedDto = createdResult.Value as PropertyDto;
+        Assert.That(returnedDto, Is.Not.Null);
+        Assert.That(returnedDto!.IdProperty, Is.EqualTo(createdProperty.IdProperty));
+        Assert.That(returnedDto.Name, Is.EqualTo(createdProperty.Name));
 
         _mockPropertyService.Verify(s => s.CreatePropertyAsync(It.Is<Property>(p =>
             p.Name == propertyDto.Name &&
@@ -285,7 +288,10 @@ public class PropertiesControllerUnitTests
         // Assert
         Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
         var okResult = result.Result as OkObjectResult;
-        Assert.That(okResult!.Value, Is.EqualTo(updatedProperty));
+        var returnedDto = okResult!.Value as PropertyDto;
+        Assert.That(returnedDto, Is.Not.Null);
+        Assert.That(returnedDto!.IdProperty, Is.EqualTo(updatedProperty.IdProperty));
+        Assert.That(returnedDto.Name, Is.EqualTo(updatedProperty.Name));
 
         _mockPropertyService.Verify(s => s.UpdatePropertyAsync(propertyId, It.Is<Property>(p =>
             p.IdProperty == propertyId &&
@@ -296,11 +302,11 @@ public class PropertiesControllerUnitTests
     }
 
     [Test]
-    public async Task UpdateProperty_WithMismatchedIds_ShouldReturnBadRequest()
+    public async Task UpdateProperty_WithInvalidPropertyData_ShouldReturnBadRequest()
     {
         // Arrange
         const int propertyId = 1;
-        var propertyDto = new PropertyDto { IdProperty = 2 }; // Different ID
+        var propertyDto = new PropertyDto { IdProperty = propertyId, Name = "" }; // Invalid - empty name
 
         // Act
         var result = await _controller.UpdateProperty(propertyId, propertyDto);
@@ -308,7 +314,7 @@ public class PropertiesControllerUnitTests
         // Assert
         Assert.That(result.Result, Is.InstanceOf<BadRequestObjectResult>());
         var badRequestResult = result.Result as BadRequestObjectResult;
-        Assert.That(badRequestResult!.Value, Is.EqualTo("Property ID mismatch"));
+        Assert.That(badRequestResult!.Value, Is.EqualTo("Property name is required"));
 
         _mockPropertyService.Verify(s => s.UpdatePropertyAsync(It.IsAny<int>(), It.IsAny<Property>()), Times.Never);
     }
@@ -318,7 +324,15 @@ public class PropertiesControllerUnitTests
     {
         // Arrange
         const int propertyId = 999;
-        var propertyDto = new PropertyDto { IdProperty = propertyId };
+        var propertyDto = new PropertyDto { 
+            IdProperty = propertyId, 
+            Name = "Valid Name",
+            Address = "Valid Address",
+            Price = 100000,
+            IdOwner = 1,
+            CodeInternal = "TEST001",
+            Year = 2020
+        };
 
         _mockPropertyService
             .Setup(s => s.UpdatePropertyAsync(propertyId, It.IsAny<Property>()))
@@ -330,7 +344,7 @@ public class PropertiesControllerUnitTests
         // Assert
         Assert.That(result.Result, Is.InstanceOf<NotFoundObjectResult>());
         var notFoundResult = result.Result as NotFoundObjectResult;
-        Assert.That(notFoundResult!.Value, Is.EqualTo($"Property with ID {propertyId} not found"));
+        Assert.That(notFoundResult!.Value, Is.EqualTo($"Property with ID {propertyId} was not found"));
     }
 
     [Test]
@@ -366,7 +380,7 @@ public class PropertiesControllerUnitTests
         // Assert
         Assert.That(result, Is.InstanceOf<NotFoundObjectResult>());
         var notFoundResult = result as NotFoundObjectResult;
-        Assert.That(notFoundResult!.Value, Is.EqualTo($"Property with ID {invalidId} not found"));
+        Assert.That(notFoundResult!.Value, Is.EqualTo($"Property with ID {invalidId} was not found"));
     }
 
     [Test]
