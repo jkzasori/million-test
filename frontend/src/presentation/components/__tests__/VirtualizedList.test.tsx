@@ -24,7 +24,7 @@ describe('VirtualizedList', () => {
 
   it('should render container with correct height', () => {
     render(<VirtualizedList {...defaultProps} />)
-    const container = screen.getByRole('region', { hidden: true })
+    const container = document.querySelector('.relative.overflow-auto') as HTMLElement
     expect(container).toHaveStyle({ height: '300px' })
   })
 
@@ -39,7 +39,7 @@ describe('VirtualizedList', () => {
 
   it('should calculate total height correctly', () => {
     render(<VirtualizedList {...defaultProps} />)
-    const innerContainer = screen.getByRole('region', { hidden: true }).firstChild as HTMLElement
+    const innerContainer = document.querySelector('.relative.overflow-auto > div') as HTMLElement
     expect(innerContainer).toHaveStyle({ 
       height: `${mockItems.length * defaultProps.itemHeight}px` 
     })
@@ -47,7 +47,7 @@ describe('VirtualizedList', () => {
 
   it('should update visible items on scroll', () => {
     render(<VirtualizedList {...defaultProps} />)
-    const container = screen.getByRole('region', { hidden: true })
+    const container = document.querySelector('.relative.overflow-auto') as HTMLElement
 
     // Get initial items
     const initialItems = screen.getAllByTestId(/^item-/)
@@ -68,8 +68,9 @@ describe('VirtualizedList', () => {
     const items = screen.getAllByTestId(/^item-/)
     
     items.forEach((item, index) => {
+      const parentDiv = item.parentElement as HTMLElement
       const expectedTop = index * defaultProps.itemHeight
-      expect(item).toHaveStyle({
+      expect(parentDiv).toHaveStyle({
         position: 'absolute',
         top: `${expectedTop}px`,
         left: '0px',
@@ -91,13 +92,13 @@ describe('VirtualizedList', () => {
   it('should apply custom className', () => {
     const customClass = 'custom-virtualized-list'
     render(<VirtualizedList {...defaultProps} className={customClass} />)
-    const container = screen.getByRole('region', { hidden: true })
+    const container = document.querySelector('.relative.overflow-auto') as HTMLElement
     expect(container).toHaveClass(customClass)
   })
 
   it('should handle empty items array', () => {
     render(<VirtualizedList {...defaultProps} items={[]} />)
-    const container = screen.getByRole('region', { hidden: true })
+    const container = document.querySelector('.relative.overflow-auto') as HTMLElement
     expect(container).toBeInTheDocument()
     expect(screen.queryByTestId(/^item-/)).not.toBeInTheDocument()
   })

@@ -83,7 +83,7 @@ describe('PropertyService', () => {
       const size = 5;
       const filters: PropertyFilters = {
         name: 'Test',
-        minPrice: 50010,
+        minPrice: 50000,
         maxPrice: 200000
       };
 

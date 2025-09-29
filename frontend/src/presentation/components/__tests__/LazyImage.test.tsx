@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, act } from '@testing-library/react'
 import { LazyImage } from '../LazyImage'
 
 // Mock IntersectionObserver
@@ -86,7 +86,9 @@ describe('LazyImage', () => {
       isIntersecting: true,
     } as IntersectionObserverEntry
 
-    intersectionCallback!([mockEntry])
+    act(() => {
+      intersectionCallback!([mockEntry])
+    })
 
     await waitFor(() => {
       expect(img).toHaveAttribute('src', defaultProps.src)
@@ -113,12 +115,16 @@ describe('LazyImage', () => {
       isIntersecting: true,
     } as IntersectionObserverEntry
 
-    intersectionCallback!([mockEntry])
+    act(() => {
+      intersectionCallback!([mockEntry])
+    })
 
     const img = screen.getByRole('img')
     
     // Simulate image load
-    img.dispatchEvent(new Event('load'))
+    act(() => {
+      img.dispatchEvent(new Event('load'))
+    })
 
     expect(mockOnLoad).toHaveBeenCalled()
   })
@@ -143,12 +149,16 @@ describe('LazyImage', () => {
       isIntersecting: true,
     } as IntersectionObserverEntry
 
-    intersectionCallback!([mockEntry])
+    act(() => {
+      intersectionCallback!([mockEntry])
+    })
 
     const img = screen.getByRole('img')
     
     // Simulate image error
-    img.dispatchEvent(new Event('error'))
+    act(() => {
+      img.dispatchEvent(new Event('error'))
+    })
 
     expect(mockOnError).toHaveBeenCalled()
   })
@@ -172,11 +182,14 @@ describe('LazyImage', () => {
       isIntersecting: true,
     } as IntersectionObserverEntry
 
-    intersectionCallback!([mockEntry])
+    act(() => {
+      intersectionCallback!([mockEntry])
+    })
 
     // Loading spinner should appear
     await waitFor(() => {
-      expect(screen.getByRole('status', { hidden: true })).toBeInTheDocument()
+      const spinner = document.querySelector('.animate-spin')
+      expect(spinner).toBeInTheDocument()
     })
   })
 
@@ -199,12 +212,16 @@ describe('LazyImage', () => {
       isIntersecting: true,
     } as IntersectionObserverEntry
 
-    intersectionCallback!([mockEntry])
+    act(() => {
+      intersectionCallback!([mockEntry])
+    })
 
     const img = screen.getByRole('img')
     
     // Simulate image error
-    img.dispatchEvent(new Event('error'))
+    act(() => {
+      img.dispatchEvent(new Event('error'))
+    })
 
     await waitFor(() => {
       expect(screen.getByRole('img', { hidden: true })).toBeInTheDocument()

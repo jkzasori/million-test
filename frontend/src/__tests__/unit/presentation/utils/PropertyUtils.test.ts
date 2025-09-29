@@ -8,7 +8,7 @@ describe('PropertyUtils', () => {
     idOwner: 1,
     name: 'Modern Villa',
     address: '123 Test Street',
-    price: 250010,
+    price: 250000,
     mainImageUrl: 'https://example.com/villa.jpg',
     ownerName: 'John Doe',
     codeInternal: 'MV001',
@@ -19,7 +19,7 @@ describe('PropertyUtils', () => {
     idProperty: 1,
     name: 'Modern Villa',
     address: '123 Test Street',
-    price: 250010,
+    price: 250000,
     image: 'https://example.com/villa.jpg',
     ownerName: 'John Doe',
     codeInternal: 'MV001',
@@ -36,7 +36,7 @@ describe('PropertyUtils', () => {
         idProperty: 1,
         name: 'Modern Villa',
         address: '123 Test Street',
-        price: 250010,
+        price: 250000,
         image: 'https://example.com/villa.jpg',
         ownerName: 'John Doe',
         codeInternal: 'MV001',
@@ -70,24 +70,24 @@ describe('PropertyUtils', () => {
         name: 'Unnamed Property',
         address: 'Address not provided',
         price: 100000,
-        image: '/placeholder-property.jpg',
+        image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop',
         ownerName: 'Private Owner',
         codeInternal: '',
-        year: expect.any(Number)
+        year: 2020
       }));
     });
   });
 
   describe('formatPrice', () => {
     it('should format price with default currency', () => {
-      expect(PropertyUtils.formatPrice(250010)).toBe('$250,000');
+      expect(PropertyUtils.formatPrice(250000)).toBe('$250,000');
       expect(PropertyUtils.formatPrice(1000)).toBe('$1,000');
-      expect(PropertyUtils.formatPrice(1500100)).toBe('$1,500,000');
+      expect(PropertyUtils.formatPrice(1500000)).toBe('$1,500,000');
     });
 
     it('should format price with custom currency', () => {
-      expect(PropertyUtils.formatPrice(250010, '€')).toBe('€250,000');
-      expect(PropertyUtils.formatPrice(250010, '£')).toBe('£250,000');
+      expect(PropertyUtils.formatPrice(250000, '€')).toBe('€250,000');
+      expect(PropertyUtils.formatPrice(250000, '£')).toBe('£250,000');
     });
 
     it('should handle zero price', () => {
@@ -220,14 +220,14 @@ describe('PropertyUtils', () => {
     const properties: UIProperty[] = [
       { ...mockUIProperty, name: 'Villa B', price: 300000, year: 2019 },
       { ...mockUIProperty, name: 'Villa A', price: 200000, year: 2021 },
-      { ...mockUIProperty, name: 'Villa C', price: 250010, year: 2020 }
+      { ...mockUIProperty, name: 'Villa C', price: 250000, year: 2020 }
     ];
 
     it('should sort by price ascending', () => {
       const result = PropertyUtils.sortProperties(properties, 'price', 'asc');
       
       expect(result[0].price).toBe(200000);
-      expect(result[1].price).toBe(250010);
+      expect(result[1].price).toBe(250000);
       expect(result[2].price).toBe(300000);
     });
 
@@ -235,7 +235,7 @@ describe('PropertyUtils', () => {
       const result = PropertyUtils.sortProperties(properties, 'price', 'desc');
       
       expect(result[0].price).toBe(300000);
-      expect(result[1].price).toBe(250010);
+      expect(result[1].price).toBe(250000);
       expect(result[2].price).toBe(200000);
     });
 

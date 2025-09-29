@@ -97,7 +97,7 @@ describe('PropertyApiClient', () => {
         pageSize: 10,
         name: 'Villa',
         minPrice: 100000,
-        maxPrice: 500100,
+        maxPrice: 500000,
         address: 'Test Street'
       };
 
