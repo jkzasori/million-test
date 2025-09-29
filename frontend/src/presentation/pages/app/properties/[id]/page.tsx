@@ -256,7 +256,7 @@ export default function PropertyDetail() {
                       <div className="md:col-span-2">
                         <p className="text-sm text-gray-600">Birthday</p>
                         <p className="font-semibold">
-                          {formatDate(property.owner.birthday)}
+                          {property.owner.birthday ? formatDate(property.owner.birthday) : 'N/A'}
                         </p>
                       </div>
                     </div>

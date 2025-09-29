@@ -37,12 +37,12 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         </p>
 
         <div className={styles.heroActions}>
-          <a href="#search" className="btn-primary">
+          <button className="btn-primary" onClick={() => document.getElementById('search')?.scrollIntoView({ behavior: 'smooth' })}>
             Explore Properties
-          </a>
-          <a href="/contact" className="btn-secondary">
+          </button>
+          <button className="btn-secondary" onClick={() => console.log('Schedule Consultation clicked')}>
             Schedule Consultation
-          </a>
+          </button>
         </div>
         
         <div className={styles.statsContainer}>

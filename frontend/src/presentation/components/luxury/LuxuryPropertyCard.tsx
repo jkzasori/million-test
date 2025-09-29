@@ -19,13 +19,15 @@ interface LuxuryPropertyCardProps {
   className?: string;
   onView?: (property: Property) => void;
   style?: React.CSSProperties;
+  priority?: boolean;
 }
 
 const LuxuryPropertyCard: React.FC<LuxuryPropertyCardProps> = ({
   property,
   className = '',
   onView,
-  style
+  style,
+  priority = false
 }) => {
   const formatPrice = (price: number) => {
     if (price >= 1000000) {
@@ -62,12 +64,12 @@ const LuxuryPropertyCard: React.FC<LuxuryPropertyCardProps> = ({
 
   const handleFavorite = (e: React.MouseEvent) => {
     e.stopPropagation();
-    // TODO: Implement favorite functionality
+    console.log('Favorite clicked for property:', property.idProperty);
   };
 
   const handleShare = (e: React.MouseEvent) => {
     e.stopPropagation();
-    // TODO: Implement share functionality
+    console.log('Share clicked for property:', property.idProperty);
   };
 
   return (
@@ -81,6 +83,7 @@ const LuxuryPropertyCard: React.FC<LuxuryPropertyCardProps> = ({
             fill
             className={styles.propertyImage}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            priority={priority}
           />
         </div>
         

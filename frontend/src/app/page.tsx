@@ -70,8 +70,7 @@ export default function Home() {
    */
   const handlePropertyView = useCallback((property: Property) => {
     console.log('Viewing property:', property.name, `(ID: ${property.idProperty})`);
-    // TODO: Implement navigation to property detail page
-    // router.push(`/properties/${property.idProperty}`);
+    window.location.href = `/property/${property.idProperty}`;
   }, []);
 
   /**

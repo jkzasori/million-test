@@ -5,9 +5,10 @@ import { Property as UIProperty } from '@/presentation/components/luxury/LuxuryP
 describe('PropertyUtils', () => {
   const mockDomainProperty: DomainProperty = {
     idProperty: 1,
+    idOwner: 1,
     name: 'Modern Villa',
     address: '123 Test Street',
-    price: 250000,
+    price: 250010,
     mainImageUrl: 'https://example.com/villa.jpg',
     ownerName: 'John Doe',
     codeInternal: 'MV001',
@@ -18,7 +19,7 @@ describe('PropertyUtils', () => {
     idProperty: 1,
     name: 'Modern Villa',
     address: '123 Test Street',
-    price: 250000,
+    price: 250010,
     image: 'https://example.com/villa.jpg',
     ownerName: 'John Doe',
     codeInternal: 'MV001',
@@ -35,7 +36,7 @@ describe('PropertyUtils', () => {
         idProperty: 1,
         name: 'Modern Villa',
         address: '123 Test Street',
-        price: 250000,
+        price: 250010,
         image: 'https://example.com/villa.jpg',
         ownerName: 'John Doe',
         codeInternal: 'MV001',
@@ -56,6 +57,7 @@ describe('PropertyUtils', () => {
     it('should use default values for missing properties', () => {
       const incompleteProperty: Partial<DomainProperty> = {
         idProperty: 1,
+        idOwner: 1,
         price: 100000,
         codeInternal: '',
         year: 2020
@@ -78,14 +80,14 @@ describe('PropertyUtils', () => {
 
   describe('formatPrice', () => {
     it('should format price with default currency', () => {
-      expect(PropertyUtils.formatPrice(250000)).toBe('$250,000');
+      expect(PropertyUtils.formatPrice(250010)).toBe('$250,000');
       expect(PropertyUtils.formatPrice(1000)).toBe('$1,000');
-      expect(PropertyUtils.formatPrice(1500000)).toBe('$1,500,000');
+      expect(PropertyUtils.formatPrice(1500100)).toBe('$1,500,000');
     });
 
     it('should format price with custom currency', () => {
-      expect(PropertyUtils.formatPrice(250000, '€')).toBe('€250,000');
-      expect(PropertyUtils.formatPrice(250000, '£')).toBe('£250,000');
+      expect(PropertyUtils.formatPrice(250010, '€')).toBe('€250,000');
+      expect(PropertyUtils.formatPrice(250010, '£')).toBe('£250,000');
     });
 
     it('should handle zero price', () => {
@@ -218,14 +220,14 @@ describe('PropertyUtils', () => {
     const properties: UIProperty[] = [
       { ...mockUIProperty, name: 'Villa B', price: 300000, year: 2019 },
       { ...mockUIProperty, name: 'Villa A', price: 200000, year: 2021 },
-      { ...mockUIProperty, name: 'Villa C', price: 250000, year: 2020 }
+      { ...mockUIProperty, name: 'Villa C', price: 250010, year: 2020 }
     ];
 
     it('should sort by price ascending', () => {
       const result = PropertyUtils.sortProperties(properties, 'price', 'asc');
       
       expect(result[0].price).toBe(200000);
-      expect(result[1].price).toBe(250000);
+      expect(result[1].price).toBe(250010);
       expect(result[2].price).toBe(300000);
     });
 
@@ -233,7 +235,7 @@ describe('PropertyUtils', () => {
       const result = PropertyUtils.sortProperties(properties, 'price', 'desc');
       
       expect(result[0].price).toBe(300000);
-      expect(result[1].price).toBe(250000);
+      expect(result[1].price).toBe(250010);
       expect(result[2].price).toBe(200000);
     });
 

@@ -21,7 +21,7 @@ export class DependencyContainer {
     if (!this._propertyService) {
       // Configuration
       const apiConfig: ApiClientConfig = {
-        baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000',
+        baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001',
         timeout: 10000,
       };
 

@@ -24,7 +24,7 @@ const mockProperties: Property[] = [
     idProperty: 1,
     name: 'Beautiful House',
     address: '123 Main St',
-    price: 500000,
+    price: 500100,
     image: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be',
     ownerName: 'John Doe',
     codeInternal: 'PROP001',

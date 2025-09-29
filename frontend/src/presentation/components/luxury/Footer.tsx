@@ -9,31 +9,31 @@ const Footer: React.FC<FooterProps> = ({ className = '' }) => {
   const currentYear = new Date().getFullYear();
 
   const companyLinks = [
-    { name: 'About Us', href: '/about' },
-    { name: 'Our Team', href: '/team' },
-    { name: 'Careers', href: '/careers' },
-    { name: 'Press', href: '/press' }
+    { name: 'About Us', href: '#' },
+    { name: 'Our Team', href: '#' },
+    { name: 'Careers', href: '#' },
+    { name: 'Press', href: '#' }
   ];
 
   const serviceLinks = [
-    { name: 'Buy Properties', href: '/buy' },
-    { name: 'Sell Properties', href: '/sell' },
-    { name: 'Property Management', href: '/management' },
-    { name: 'Investment Advisory', href: '/investment' }
+    { name: 'Buy Properties', href: '#' },
+    { name: 'Sell Properties', href: '#' },
+    { name: 'Property Management', href: '#' },
+    { name: 'Investment Advisory', href: '#' }
   ];
 
   const resourceLinks = [
-    { name: 'Market Reports', href: '/reports' },
-    { name: 'Neighborhood Guide', href: '/neighborhoods' },
-    { name: 'Financing Options', href: '/financing' },
-    { name: 'Legal Resources', href: '/legal' }
+    { name: 'Market Reports', href: '#' },
+    { name: 'Neighborhood Guide', href: '#' },
+    { name: 'Financing Options', href: '#' },
+    { name: 'Legal Resources', href: '#' }
   ];
 
   const legalLinks = [
-    { name: 'Privacy Policy', href: '/privacy' },
-    { name: 'Terms of Service', href: '/terms' },
-    { name: 'Cookie Policy', href: '/cookies' },
-    { name: 'Accessibility', href: '/accessibility' }
+    { name: 'Privacy Policy', href: '#' },
+    { name: 'Terms of Service', href: '#' },
+    { name: 'Cookie Policy', href: '#' },
+    { name: 'Accessibility', href: '#' }
   ];
 
   return (

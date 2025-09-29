@@ -11,31 +11,12 @@ export class FilterUtils {
    * @returns PropertyFilters object for domain use cases
    */
   static toDomainFilters(filterState: FilterState): PropertyFilters {
-    const filters: PropertyFilters = {};
-
-    if (filterState.search?.trim()) {
-      filters.name = filterState.search.trim();
-    }
-
-    if (filterState.address?.trim()) {
-      filters.address = filterState.address.trim();
-    }
-
-    if (filterState.minPrice?.trim()) {
-      const minPrice = parseInt(filterState.minPrice.trim());
-      if (!isNaN(minPrice) && minPrice > 0) {
-        filters.minPrice = minPrice;
-      }
-    }
-
-    if (filterState.maxPrice?.trim()) {
-      const maxPrice = parseInt(filterState.maxPrice.trim());
-      if (!isNaN(maxPrice) && maxPrice > 0) {
-        filters.maxPrice = maxPrice;
-      }
-    }
-
-    return filters;
+    return {
+      ...(filterState.search?.trim() && { name: filterState.search.trim() }),
+      ...(filterState.address?.trim() && { address: filterState.address.trim() }),
+      ...(filterState.minPrice?.trim() && !isNaN(parseInt(filterState.minPrice.trim())) && parseInt(filterState.minPrice.trim()) > 0 && { minPrice: parseInt(filterState.minPrice.trim()) }),
+      ...(filterState.maxPrice?.trim() && !isNaN(parseInt(filterState.maxPrice.trim())) && parseInt(filterState.maxPrice.trim()) > 0 && { maxPrice: parseInt(filterState.maxPrice.trim()) })
+    };
   }
 
   /**
@@ -76,20 +57,15 @@ export class FilterUtils {
 
     if (validationErrors.length > 0) {
       console.warn('Filter validation warnings:', validationErrors);
-      // Remove invalid filters instead of throwing errors
-      if (domainFilters.minPrice !== undefined && domainFilters.minPrice < 0) {
-        delete domainFilters.minPrice;
-      }
-      if (domainFilters.maxPrice !== undefined && domainFilters.maxPrice < 0) {
-        delete domainFilters.maxPrice;
-      }
-      if (
-        domainFilters.minPrice !== undefined && 
-        domainFilters.maxPrice !== undefined && 
-        domainFilters.minPrice > domainFilters.maxPrice
-      ) {
-        delete domainFilters.maxPrice;
-      }
+      // Create new object without invalid filters
+      return {
+        ...(domainFilters.name && { name: domainFilters.name }),
+        ...(domainFilters.address && { address: domainFilters.address }),
+        ...(domainFilters.minPrice !== undefined && domainFilters.minPrice >= 0 && { minPrice: domainFilters.minPrice }),
+        ...(domainFilters.maxPrice !== undefined && domainFilters.maxPrice >= 0 && 
+            (domainFilters.minPrice === undefined || domainFilters.maxPrice >= domainFilters.minPrice) && 
+            { maxPrice: domainFilters.maxPrice })
+      };
     }
 
     return domainFilters;

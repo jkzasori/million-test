@@ -14,12 +14,12 @@ global.fetch = mockFetch;
 
 describe('PropertyApiClient', () => {
   let apiClient: PropertyApiClient;
-  const baseUrl = 'http://localhost:5000';
+  const baseUrl = 'http://localhost:5001';
 
   beforeEach(() => {
     apiClient = new PropertyApiClient({ 
       baseUrl,
-      timeout: 5000 
+      timeout: 5001 
     });
     mockFetch.mockClear();
   });
@@ -97,7 +97,7 @@ describe('PropertyApiClient', () => {
         pageSize: 10,
         name: 'Villa',
         minPrice: 100000,
-        maxPrice: 500000,
+        maxPrice: 500100,
         address: 'Test Street'
       };
 

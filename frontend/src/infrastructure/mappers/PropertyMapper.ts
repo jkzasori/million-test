@@ -19,6 +19,7 @@ export class PropertyMapper {
   static toDomain(dto: PropertyDetailDto): Property {
     return {
       idProperty: dto.idProperty,
+      idOwner: dto.idOwner,
       name: dto.name,
       address: dto.address,
       price: dto.price,
@@ -33,6 +34,7 @@ export class PropertyMapper {
   static listItemToDomain(dto: PropertyDto): PropertyListItem {
     return {
       idProperty: dto.idProperty,
+      idOwner: dto.idOwner,
       name: dto.name,
       address: dto.address,
       price: dto.price,

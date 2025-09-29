@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Header from '@/components/luxury/Header';
-import HeroSection from '@/components/luxury/HeroSection';
-import FilterBar, { FilterState } from '@/components/luxury/FilterBar';
-import PropertyGrid from '@/components/luxury/PropertyGrid';
-import LuxuryPagination from '@/components/luxury/LuxuryPagination';
-import Footer from '@/components/luxury/Footer';
-import { Property } from '@/components/luxury/LuxuryPropertyCard';
+import Header from '@/presentation/components/luxury/Header';
+import HeroSection from '@/presentation/components/luxury/HeroSection';
+import FilterBar, { FilterState } from '@/presentation/components/luxury/FilterBar';
+import PropertyGrid from '@/presentation/components/luxury/PropertyGrid';
+import LuxuryPagination from '@/presentation/components/luxury/LuxuryPagination';
+import Footer from '@/presentation/components/luxury/Footer';
+import { Property } from '@/presentation/components/luxury/LuxuryPropertyCard';
 import { PropertyFilterDto, PropertyListResponseDto } from '@/types/property';
 import { propertyService } from '@/services/api';
 
@@ -96,8 +96,8 @@ export default function Home() {
   };
 
   const handlePropertyView = (property: Property) => {
-    console.log('Viewing property:', property);
-    // TODO: Implement property detail view
+    console.log('Viewing property:', property.name, '(ID:', property.idProperty + ')');
+    window.location.href = `/property/${property.idProperty}`;
   };
 
   return (

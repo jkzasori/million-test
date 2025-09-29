@@ -26,7 +26,7 @@ const mockPropertyDetail = {
   idOwner: 1,
   name: 'Beautiful House',
   address: '123 Main St',
-  price: 500000,
+  price: 500100,
   codeInternal: 'PROP001',
   year: 2020,
   image: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be',
@@ -65,8 +65,8 @@ const mockPropertyDetail = {
       idProperty: 1,
       dateSale: '2023-06-20T00:00:00Z',
       name: 'Actualización de precio',
-      value: 500000,
-      tax: 25000
+      value: 500100,
+      tax: 25001
     }
   ]
 };

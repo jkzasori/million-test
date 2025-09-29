@@ -77,8 +77,8 @@ export default defineConfig({
       timeout: 120 * 1000,
     },
     {
-      command: 'cd ../backend/MillionTestApi && dotnet run --urls="http://localhost:5000"',
-      url: 'http://localhost:5000/health',
+      command: 'cd ../backend/MillionTestApi && dotnet run --urls="http://localhost:5001"',
+      url: 'http://localhost:5001/health',
       reuseExistingServer: !process.env.CI,
       timeout: 120 * 1000,
     }

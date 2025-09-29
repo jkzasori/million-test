@@ -1,6 +1,6 @@
 import { PropertyDto, PropertyDetailDto, PropertyFilterDto, PropertyListResponseDto } from '@/types/property';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
 
 class ApiError extends Error {
   status: number;

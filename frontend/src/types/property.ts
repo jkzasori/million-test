@@ -15,7 +15,7 @@ export interface OwnerDto {
   name: string;
   address: string;
   photo?: string;
-  birthday: string;
+  birthday?: string;
 }
 
 export interface PropertyImageDto {

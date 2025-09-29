@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, notFound } from 'next/navigation';
 import Link from 'next/link';
-import Header from '@/components/luxury/Header';
-import Footer from '@/components/luxury/Footer';
-import PropertyDetail from '@/components/luxury/PropertyDetail';
+import Header from '@/presentation/components/luxury/Header';
+import Footer from '@/presentation/components/luxury/Footer';
+import PropertyDetail from '@/presentation/components/luxury/PropertyDetail';
 import { PropertyDetailDto } from '@/types/property';
 import { propertyService, ApiError } from '@/services/api';
 import styles from './page.module.css';

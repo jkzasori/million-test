@@ -14,6 +14,7 @@ describe('PropertyService', () => {
 
   const mockProperty: Property = {
     idProperty: 1,
+    idOwner: 1,
     name: 'Test Property',
     address: 'Test Address',
     price: 100000,
@@ -82,7 +83,7 @@ describe('PropertyService', () => {
       const size = 5;
       const filters: PropertyFilters = {
         name: 'Test',
-        minPrice: 50000,
+        minPrice: 50010,
         maxPrice: 200000
       };
 

@@ -12,11 +12,7 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navigation = [
-    { name: 'Properties', href: '/' },
-    { name: 'Buy', href: '/buy' },
-    { name: 'Sell', href: '/sell' },
-    { name: 'About', href: '/about' },
-    { name: 'Contact', href: '/contact' }
+    { name: 'Properties', href: '/' }
   ];
 
   return (
@@ -45,9 +41,9 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
 
           {/* CTA Button */}
           <div className={styles.navCta}>
-            <Link href="/contact" className={styles.btnAccent}>
+            <button className={styles.btnAccent} onClick={() => console.log('Get Started clicked')}>
               Get Started
-            </Link>
+            </button>
           </div>
 
           {/* Mobile menu button */}
@@ -79,13 +75,15 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
                 {item.name}
               </Link>
             ))}
-            <Link
-              href="/contact"
+            <button
               className={`${styles.btnAccent} ${styles.mobileCta}`}
-              onClick={() => setMobileMenuOpen(false)}
+              onClick={() => {
+                setMobileMenuOpen(false);
+                console.log('Get Started clicked');
+              }}
             >
               Get Started
-            </Link>
+            </button>
           </div>
         </div>
       </nav>

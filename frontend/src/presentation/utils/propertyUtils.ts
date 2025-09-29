@@ -1,11 +1,11 @@
-import { Property as DomainProperty } from '@/domain/entities/Property';
+import { PropertyListItem as DomainProperty } from '@/domain/entities/Property';
 import { Property as UIProperty } from '@/presentation/components/luxury/LuxuryPropertyCard';
 
 /**
  * Utility functions for property data transformations and operations
  */
 export class PropertyUtils {
-  private static readonly DEFAULT_IMAGE = '/placeholder-property.jpg';
+  private static readonly DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop';
   private static readonly DEFAULT_OWNER = 'Private Owner';
 
   /**

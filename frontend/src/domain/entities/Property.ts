@@ -24,6 +24,7 @@ export interface PropertyTrace {
 
 export interface Property {
   readonly idProperty: number;
+  readonly idOwner: number;
   readonly name: string;
   readonly address: string;
   readonly price: number;
@@ -36,6 +37,7 @@ export interface Property {
 
 export interface PropertyListItem {
   readonly idProperty: number;
+  readonly idOwner: number;
   readonly name: string;
   readonly address: string;
   readonly price: number;

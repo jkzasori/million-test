@@ -15,9 +15,9 @@ export default function PropertyDetailPage() {
   const id = parseInt(params.id as string);
   if (isNaN(id)) {
     notFound();
-    return null;
   }
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { property, loading, error } = useProperty(id);
 
   if (error) {
