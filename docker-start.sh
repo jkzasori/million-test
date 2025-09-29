@@ -71,7 +71,7 @@ start_services() {
     echo ""
     echo "📍 Access your application:"
     echo "   🌐 Frontend:  http://localhost:3000"
-    echo "   🔧 Backend:   http://localhost:5000"
+    echo "   🔧 Backend:   http://localhost:5001"
     echo "   🗄️  MongoDB:   localhost:27017"
     echo ""
     echo "📋 Useful commands:"
@@ -128,7 +128,7 @@ show_status() {
     echo ""
     echo "🔍 Health Check URLs:"
     echo "   Frontend:  curl -f http://localhost:3000"
-    echo "   Backend:   curl -f http://localhost:5000/health"
+    echo "   Backend:   curl -f http://localhost:5001/health"
 }
 
 # Function to clean everything

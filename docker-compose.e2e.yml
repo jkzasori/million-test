@@ -33,7 +33,7 @@ services:
     restart: unless-stopped
     environment:
       - ASPNETCORE_ENVIRONMENT=Testing
-      - ASPNETCORE_URLS=http://+:5000
+      - ASPNETCORE_URLS=http://+:5001
       - ConnectionStrings__DefaultConnection=mongodb://admin:million123@mongodb-e2e:27017/MillionTestPropertiesE2E?authSource=admin
       - CORS__AllowedOrigins=http://localhost:3001,http://frontend-e2e:3000
     ports:
@@ -44,7 +44,7 @@ services:
     networks:
       - million-test-e2e-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
       interval: 30s
       timeout: 10s
       retries: 3

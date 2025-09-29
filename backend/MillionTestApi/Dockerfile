@@ -6,7 +6,7 @@ EXPOSE 5001
 
 # Set environment to production for optimized runtime
 ENV ASPNETCORE_ENVIRONMENT=Production
-ENV ASPNETCORE_URLS=http://+:5000
+ENV ASPNETCORE_URLS=http://+:5001
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
@@ -38,6 +38,6 @@ USER appuser
 
 # Health check endpoint
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-  CMD curl -f http://localhost:5000/health || exit 1
+  CMD curl -f http://localhost:5001/health || exit 1
 
 ENTRYPOINT ["dotnet", "MillionTestApi.dll"]

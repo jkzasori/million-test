@@ -2,6 +2,16 @@
 
 A full-stack real estate application built with .NET Core 9, MongoDB, and Next.js. This application allows users to search, filter, and view property listings with detailed information.
 
+## 📸 Screenshots
+
+### Home Page - Property Search
+![Home Page](docs/images/home.png)
+*Premium luxury UI with glass morphism effects, advanced search filters, and responsive property grid*
+
+### Property Detail View
+![Property Detail](docs/images/detail.png)
+*Detailed property information with image gallery, owner details, and transaction history*
+
 ## 🏗️ Architecture Overview
 
 ```
@@ -77,6 +87,90 @@ million-test/
 - [MongoDB Community Server](https://www.mongodb.com/try/download/community)
 - [Git](https://git-scm.com/)
 
+## 🐳 Docker Setup (Recommended)
+
+The easiest way to run the project is using Docker Compose, which automatically sets up MongoDB, backend API, frontend, and data seeding.
+
+### Option 1: Docker Compose (Full Stack)
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd million-test
+
+# Start all services with Docker Compose
+docker-compose up -d
+
+# ✅ Backend API: http://localhost:5001
+# ✅ Frontend App: http://localhost:3000  
+# ✅ MongoDB: localhost:27017 (admin:million123)
+# ✅ API Documentation: http://localhost:5001/swagger
+# ✅ Automatic data seeding with 2,500+ properties
+```
+
+**What's included:**
+- **MongoDB 7.0** with authentication and health checks
+- **.NET Core 9 Backend** with production configuration
+- **Next.js Frontend** with optimized build
+- **Data Seeder** that automatically populates the database
+- **Network isolation** and **volume persistence**
+
+### Option 2: Docker with Local Development
+
+```bash
+# Start only MongoDB with Docker
+docker run -d --name million-test-mongo \
+  -p 27017:27017 \
+  -e MONGO_INITDB_ROOT_USERNAME=admin \
+  -e MONGO_INITDB_ROOT_PASSWORD=million123 \
+  -v million-test-data:/data/db \
+  mongo:7.0
+
+# Then run backend and frontend locally
+cd backend/MillionTestApi && dotnet run
+cd frontend && npm run dev
+```
+
+### Docker Commands
+
+```bash
+# View running containers and their status
+docker-compose ps
+
+# View logs from all services
+docker-compose logs -f
+
+# View logs from specific service
+docker-compose logs -f backend
+docker-compose logs -f frontend
+docker-compose logs -f mongodb
+
+# Stop all services
+docker-compose down
+
+# Rebuild and restart (after code changes)
+docker-compose up -d --build
+
+# Clean up (removes containers and data)
+docker-compose down -v
+
+# Run only specific services
+docker-compose up -d mongodb backend  # Just database and API
+```
+
+### Docker Health Checks
+
+The setup includes health checks for all services:
+
+```bash
+# Check service health
+docker-compose ps
+
+# Manual health check
+curl http://localhost:5001/health  # Backend
+curl http://localhost:3000         # Frontend
+```
+
 ## ⚡ Quick Start (5 minutes)
 
 ### Prerequisites Check
@@ -91,8 +185,8 @@ Make sure you have installed:
 ```bash
 cd backend/MillionTestApi
 dotnet run
-# ✅ API running at http://localhost:5000
-# ✅ Swagger docs at http://localhost:5000/swagger
+# ✅ API running at http://localhost:5001
+# ✅ Swagger docs at http://localhost:5001/swagger
 ```
 
 **Terminal 2 - Frontend App:**
@@ -129,7 +223,7 @@ dotnet build
 dotnet test   # Should pass all 15 tests
 
 # Start API server
-dotnet run --urls="http://localhost:5000"
+dotnet run --urls="http://localhost:5001"
 ```
 
 #### 3. Frontend Setup  
@@ -145,14 +239,14 @@ npm run dev
 
 ### 🌐 Access Points
 - **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:5000  
-- **API Documentation**: http://localhost:5000/swagger
-- **Health Check**: http://localhost:5000/api/properties
+- **Backend API**: http://localhost:5001  
+- **API Documentation**: http://localhost:5001/swagger
+- **Health Check**: http://localhost:5001/api/properties
 
 ### 🧪 Verify Everything Works
 ```bash
 # Test backend
-curl http://localhost:5000/api/properties
+curl http://localhost:5001/api/properties
 
 # Test frontend (should show property search page)
 open http://localhost:3000
@@ -252,7 +346,7 @@ Edit `appsettings.json` and `appsettings.Development.json`:
 Create `.env.local` in the frontend directory:
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:5000
+NEXT_PUBLIC_API_URL=http://localhost:5001
 ```
 
 ## 🧪 Testing

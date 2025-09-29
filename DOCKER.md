@@ -25,7 +25,7 @@ docker compose up -d
 
 ¡Eso es todo! La aplicación estará disponible en:
 - **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:5000
+- **Backend API**: http://localhost:5001
 - **MongoDB**: localhost:27017
 
 ## 🏗️ Arquitectura de Contenedores
@@ -54,8 +54,8 @@ docker compose up -d
 
 ### 🔧 **Backend API (.NET)**
 - **Puerto**: 5000
-- **Health Check**: http://localhost:5000/health
-- **Swagger UI**: http://localhost:5000/swagger (en desarrollo)
+- **Health Check**: http://localhost:5001/health
+- **Swagger UI**: http://localhost:5001/swagger (en desarrollo)
 
 ### 🌐 **Frontend (Next.js)**
 - **Puerto**: 3000
@@ -160,7 +160,7 @@ docker compose ps
 ```
 
 ### Endpoints de Health Check
-- **Backend**: http://localhost:5000/health
+- **Backend**: http://localhost:5001/health
 - **Frontend**: http://localhost:3000 (responde con la página principal)
 - **MongoDB**: Health check interno de Docker
 

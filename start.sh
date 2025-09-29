@@ -61,7 +61,7 @@ else
 fi
 
 echo "   🚀 Starting backend API..."
-dotnet run --urls="http://localhost:5000" &
+dotnet run --urls="http://localhost:5001" &
 BACKEND_PID=$!
 
 # Wait for backend to start
@@ -87,8 +87,8 @@ echo "🎉 Application started successfully!"
 echo ""
 echo "📱 Access your application:"
 echo "   🌐 Frontend:     http://localhost:3000"
-echo "   🔗 Backend API:  http://localhost:5000"  
-echo "   📚 API Docs:     http://localhost:5000/swagger"
+echo "   🔗 Backend API:  http://localhost:5001"  
+echo "   📚 API Docs:     http://localhost:5001/swagger"
 echo ""
 echo "📋 Process IDs:"
 echo "   Backend PID:  $BACKEND_PID"

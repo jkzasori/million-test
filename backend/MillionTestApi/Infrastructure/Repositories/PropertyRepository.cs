@@ -6,6 +6,8 @@ using MillionTestApi.DTOs;
 using MillionTestApi.Infrastructure.Services;
 using MillionTestApi.Models;
 using MongoDB.Driver;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 
 namespace MillionTestApi.Infrastructure.Repositories;
 
@@ -78,34 +80,15 @@ public class PropertyRepository : IPropertyRepository
                 filterBuilder &= Builders<Property>.Filter.Lte(p => p.Price, filter.MaxPrice.Value);
             }
 
-            // Use aggregation for better performance with large datasets
-            var pipeline = new BsonDocument[]
-            {
-                new BsonDocument("$match", filterBuilder.Render(_properties.DocumentSerializer, _properties.Settings.SerializerRegistry)),
-                new BsonDocument("$facet", new BsonDocument
-                {
-                    { "data", new BsonArray
-                        {
-                            new BsonDocument("$sort", new BsonDocument("IdProperty", 1)),
-                            new BsonDocument("$skip", (filter.Page - 1) * filter.PageSize),
-                            new BsonDocument("$limit", filter.PageSize)
-                        }
-                    },
-                    { "count", new BsonArray
-                        {
-                            new BsonDocument("$count", "total")
-                        }
-                    }
-                })
-            };
-
-            var aggregationResult = await _properties.AggregateAsync<BsonDocument>(pipeline);
-            var result = await aggregationResult.FirstOrDefaultAsync();
-
-            var properties = result?["data"]?.AsBsonArray?.Select(doc =>
-                BsonSerializer.Deserialize<Property>(doc.AsBsonDocument)).ToList() ?? new List<Property>();
-
-            var totalCount = result?["count"]?.AsBsonArray?.FirstOrDefault()?["total"]?.AsInt32 ?? 0;
+            // Use simple approach instead of complex aggregation
+            var totalCount = await _properties.CountDocumentsAsync(filterBuilder);
+            
+            var properties = await _properties
+                .Find(filterBuilder)
+                .Sort(Builders<Property>.Sort.Ascending(p => p.IdProperty))
+                .Skip((filter.Page - 1) * filter.PageSize)
+                .Limit(filter.PageSize)
+                .ToListAsync();
 
             // Optimized: Get all owner IDs and property IDs in bulk
             var ownerIds = properties.Select(p => p.IdOwner).Distinct().ToList();

@@ -183,7 +183,7 @@ class Program
         Console.WriteLine($"   📸 Images: {images.Count:N0}");
         Console.WriteLine($"   📈 Traces: {traces.Count:N0}");
         Console.WriteLine();
-        Console.WriteLine($"🌐 Test your API: curl http://localhost:5000/api/properties");
+        Console.WriteLine($"🌐 Test your API: curl http://localhost:5001/api/properties");
         Console.WriteLine($"🔍 Frontend ready: http://localhost:3000");
     }
 }
